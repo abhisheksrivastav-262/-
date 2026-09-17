@@ -303,3 +303,19 @@ a,button{-webkit-tap-highlight-color:transparent}
 .qr-wrap{display:grid;justify-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px}
 .qr-wrap img{width:min(240px,70vw);height:auto}
 @media(max-width:640px){.purpose-toggle{grid-template-columns:1fr}.ad-slide{padding:40px 16% 56px}}
+
+/* ---------- Leadership ---------- */
+.leaders-sec{background:#fff}
+.grid-leaders{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
+.leader-card{margin:0;background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 1px 0 rgba(10,26,60,.04);transition:.25s ease;text-align:center}
+.leader-card:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:#c9d6ff}
+.leader-card img{width:100%;aspect-ratio:3/3.4;object-fit:cover;object-position:top;background:#eef2ff}
+.leader-card figcaption{padding:16px 14px;font-weight:800;color:var(--navy);font-size:.98rem;line-height:1.55;border-top:3px solid var(--gold)}
+@media(max-width:1020px){.grid-leaders{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.grid-leaders{grid-template-columns:1fr}.leader-card img{aspect-ratio:3/3}}
+/* landscape photo — बिना कटे पूरी दिखे */
+.leader-card--full img{aspect-ratio:4/3;object-fit:contain;background:#0a1a3c}
+/* Event highlight photo — chhota size, bina kate, mobile-friendly */
+.split img.frame.event-photo{max-width:340px;width:100%;height:auto;margin:0 auto;aspect-ratio:auto;object-fit:contain;display:block}
+.g-item--tall img{height:320px;object-fit:contain;background:#0a1a3c}
+@media(max-width:640px){.split img.frame.event-photo{max-width:260px}.g-item--tall img{height:300px}}

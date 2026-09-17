@@ -43,6 +43,8 @@ body.no-chrome{padding-top:0}
 .site-header{background:rgba(255,255,255,.97);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 .header-in{display:flex;align-items:center;gap:18px;height:var(--header-h)}
 .brand{display:flex;align-items:center;gap:12px;text-decoration:none;min-width:0}
+.brand-logo{width:54px;height:54px;flex:0 0 54px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid var(--gold)}
+.footer-logo{width:66px;height:66px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid var(--gold);display:block;margin-bottom:12px}
 .emblem{width:52px;height:52px;flex:0 0 52px;border-radius:50%;background:conic-gradient(from 200deg,var(--navy),var(--royal),var(--navy));display:grid;place-items:center;color:#fff;position:relative;border:2px solid var(--gold)}
 .emblem::after{content:"ज";font-weight:800;font-size:1.5rem;line-height:1}
 .emblem-ring{position:absolute;inset:-6px;border:1px solid rgba(201,162,39,.5);border-radius:50%}

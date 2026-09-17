@@ -174,7 +174,8 @@
   }
   const isHome = (path === "index.html");
   const trustEl = document.querySelector(".trust");
-  if(isHome && trustEl) buildSlider(trustEl);
+  // Home पर prime spot (hero के नीचे) अब असली संगठन वीडियो का है — demo ad slider नहीं दिखेगा
+  void trustEl;
   const footerEl = document.querySelector("footer");
   if(isHome && footerEl) buildVideoAd(footerEl);
   const pageHero = document.querySelector(".page-hero");

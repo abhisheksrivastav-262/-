@@ -321,3 +321,10 @@ a,button{-webkit-tap-highlight-color:transparent}
 .split img.frame.event-photo{max-width:340px;width:100%;height:auto;margin:0 auto;aspect-ratio:auto;object-fit:contain;display:block}
 .g-item--tall img{height:320px;object-fit:contain;background:#0a1a3c}
 @media(max-width:640px){.split img.frame.event-photo{max-width:260px}.g-item--tall img{height:300px}}
+/* Home organization video (real) */
+.home-video{max-width:820px;margin:0 auto 34px;background:#fff;border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow-sm);padding:18px;position:relative}
+.home-video video{width:100%;height:auto;border-radius:12px;background:#000;display:block}
+.home-video .ad-tag{background:var(--navy);border-color:var(--navy);position:absolute;top:28px;left:28px;z-index:2}
+/* Video just below hero */
+.home-video-sec{background:#fff;padding:56px 0 64px}
+.home-video-sec .home-video{margin:0 auto}

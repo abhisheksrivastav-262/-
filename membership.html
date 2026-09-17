@@ -48,6 +48,29 @@
 <h2 style="margin-top:0">सदस्यता आवेदन फॉर्म</h2>
 <p class="hint">* चिह्नित फ़ील्ड आवश्यक हैं। जानकारी केवल सदस्यता संपर्क हेतु उपयोग होगी।</p>
 <form id="membershipForm" novalidate>
+<div class="field full" style="margin-bottom:14px">
+<label>उद्देश्य चुनें *</label>
+<div class="purpose-toggle" role="radiogroup" aria-label="उद्देश्य चुनें">
+<label><input type="radio" name="purpose" value="सदस्यता आवेदन" checked> 📝 सदस्यता आवेदन</label>
+<label><input type="radio" name="purpose" value="दान (सहयोग राशि)"> ❤️ दान / सहयोग राशि</label>
+</div>
+</div>
+<div id="donateBox" class="donate-box" hidden>
+<strong style="color:var(--navy)">दान / सहयोग राशि — QR पर भुगतान करें</strong>
+<ol class="hint">
+<li>नीचे दिए QR को अपनी UPI ऐप से स्कैन करके भुगतान करें।</li>
+<li>भुगतान की <b>राशि (₹)</b> और <b>UTR/रेफरेंस नंबर</b> नीचे भरें।</li>
+<li>Submit दबाएं — पूरी जानकारी WhatsApp पर भेजी जाएगी।</li>
+</ol>
+<div class="qr-wrap">
+<img src="assets/donate-qr-placeholder.svg" alt="दान हेतु डेमो QR — असली UPI QR बाद में लगाया जाएगा" width="240" height="300">
+<span class="hint">Demo QR — संगठन का असली UPI QR मिलते ही बदला जाएगा</span>
+</div>
+<div class="form-grid">
+<div class="field"><label for="m-amount">दान राशि (₹) *</label><input id="m-amount" name="amount" inputmode="numeric" placeholder="जैसे — 501"></div>
+<div class="field"><label for="m-utr">UTR / रेफरेंस नंबर</label><input id="m-utr" name="utr" placeholder="भुगतान रेफरेंस (यदि हो)"></div>
+</div>
+</div>
 <div class="form-grid">
 <div class="field"><label for="m-name">पूरा नाम *</label><input id="m-name" name="name" required autocomplete="name" placeholder="आपका पूरा नाम"></div>
 <div class="field"><label for="m-mobile">मोबाइल नंबर *</label><input id="m-mobile" name="mobile" required inputmode="numeric" pattern="[0-9+ ]{10,15}" placeholder="10 अंकों का मोबाइल"></div>

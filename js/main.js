@@ -41,7 +41,7 @@
     window.open(url,"_blank","noopener");
   }
 
-  // Membership form
+  // Membership form (+ Donate option)
   const mform = $("#membershipForm");
   if(mform){
     mform.addEventListener("submit",e=>{
@@ -50,9 +50,14 @@
       const v = k=>String(fd.get(k)||"").trim();
       const mobile = v("mobile").replace(/\D/g,"");
       if(!v("name")||mobile.length<10){ alert("कृपया सही नाम और 10 अंकों का मोबाइल नंबर भरें।"); return; }
+      const purpose = v("purpose") || "सदस्यता आवेदन";
+      const isDonate = purpose.indexOf("दान") === 0;
+      if(isDonate && !(Number(v("amount"))>0)){ alert("कृपया दान की राशि (₹) भरें।"); return; }
       const lines = [
-        "नमस्ते, मुझे जर्नलिस्ट सेवा परिषद की सदस्यता के लिए आवेदन करना है।",
+        isDonate ? "नमस्ते, मैं जर्नलिस्ट सेवा परिषद को सहयोग (दान) देना चाहता/चाहती हूँ। मैंने नीचे दिए QR पर भुगतान कर दिया है।"
+                 : "नमस्ते, मुझे जर्नलिस्ट सेवा परिषद की सदस्यता के लिए आवेदन करना है।",
         "———————————",
+        "उद्देश्य: " + purpose,
         "पूरा नाम: "+v("name"),
         "मोबाइल नंबर: "+v("mobile"),
         "ईमेल: "+(v("email")||"-"),
@@ -63,12 +68,28 @@
         "पद / भूमिका: "+(v("role")||"-"),
         "पत्रकारिता अनुभव: "+(v("exp")||"-"),
         "संदेश: "+(v("message")||"-"),
+        ...(isDonate ? ["दान राशि: ₹" + v("amount"), "UTR/रेफरेंस: " + (v("utr") || "-")] : []),
         "———————————",
-        "कृपया सदस्यता प्रक्रिया की जानकारी दें।"
+        isDonate ? "कृपया भुगतान की पुष्टि करें।" : "कृपया सदस्यता प्रक्रिया की जानकारी दें।"
       ];
       $("#formStatus") && ($("#formStatus").textContent = "WhatsApp खुल रहा है… कृपया Send दबाकर आवेदन भेजें।");
       openWhatsApp(lines.join("\n"));
     });
+    // Donate box toggle + #donate preselect + submit text swap
+    const donateBox = $("#donateBox");
+    const submitBtn = mform.querySelector('button[type="submit"]');
+    const syncPurpose = ()=>{
+      const sel = mform.querySelector('input[name="purpose"]:checked');
+      const isDon = sel && sel.value.indexOf("दान")===0;
+      if(donateBox) donateBox.hidden = !isDon;
+      if(submitBtn) submitBtn.textContent = isDon ? "दान की जानकारी भेजें →" : "सदस्यता के लिए आवेदन करें →";
+    };
+    $$('input[name="purpose"]', mform).forEach(r=>r.addEventListener("change",syncPurpose));
+    if(location.hash === "#donate"){
+      const d = mform.querySelector('input[name="purpose"][value^="दान"]');
+      if(d) d.checked = true;
+    }
+    syncPurpose();
   }
 
   // Contact form
@@ -92,6 +113,72 @@
       openWhatsApp(lines.join("\n"));
     });
   }
+
+  // ---------- Advertisements (DEMO placeholders — CMS/असली विज्ञापन से बदलें) ----------
+  const ADS = [
+    {label:"विज्ञापन", title:"आपका विज्ञापन यहाँ", text:"इस प्रीमियम स्थान पर अपना विज्ञापन दिखाएं। संपर्क करें — 8318168274", cta:"संपर्क करें →", href:"tel:8318168274", theme:"house"},
+    {label:"विज्ञापन • Demo", title:"Demo विज्ञापन", text:"यह उदाहरण स्लाइड है — असली विज्ञापनदाता मिलते ही बदल दी जाएगी।", cta:"Demo", href:"contact.html", theme:"t1"},
+    {label:"विज्ञापन • Demo", title:"Demo विज्ञापन", text:"यह उदाहरण स्लाइड है — असली विज्ञापनदाता मिलते ही बदल दी जाएगी।", cta:"Demo", href:"contact.html", theme:"t2"}
+  ];
+  function adSlideHTML(a){
+    return '<span class="ad-tag">'+a.label+'</span>'
+      + '<div><h3>'+a.title+'</h3><p>'+a.text+'</p>'
+      + '<a class="btn btn-gold btn-sm" href="'+a.href+'">'+a.cta+'</a></div>';
+  }
+  function buildSlider(afterEl){
+    const sec = document.createElement("section");
+    sec.className = "ad-section";
+    sec.setAttribute("aria-label","विज्ञापन");
+    sec.innerHTML = '<div class="container"><div class="ad-slider"><div class="ad-track">'
+      + ADS.map(a=>'<div class="ad-slide theme-'+a.theme+'">'+adSlideHTML(a)+'</div>').join("")
+      + '</div><button class="ad-nav prev" aria-label="पिछला विज्ञापन">‹</button>'
+      + '<button class="ad-nav next" aria-label="अगला विज्ञापन">›</button><div class="ad-dots">'
+      + ADS.map((_,i)=>'<button aria-label="विज्ञापन '+(i+1)+'"></button>').join("")
+      + '</div></div></div>';
+    afterEl.after(sec);
+    const track = sec.querySelector(".ad-track");
+    const dots = Array.from(sec.querySelectorAll(".ad-dots button"));
+    let idx = 0, timer = null;
+    const go = i=>{ idx=(i+ADS.length)%ADS.length; track.style.transform="translateX(-"+(idx*100)+"%)"; dots.forEach((d,k)=>d.classList.toggle("active",k===idx)); };
+    const play = ()=>{ stop(); timer=setInterval(()=>go(idx+1),5000); };
+    const stop = ()=>{ if(timer){clearInterval(timer); timer=null;} };
+    sec.querySelector(".prev").addEventListener("click",()=>{go(idx-1);play();});
+    sec.querySelector(".next").addEventListener("click",()=>{go(idx+1);play();});
+    dots.forEach((d,k)=>d.addEventListener("click",()=>{go(k);play();}));
+    const slider = sec.querySelector(".ad-slider");
+    slider.addEventListener("pointerenter",stop);
+    slider.addEventListener("pointerleave",play);
+    go(0); play();
+  }
+  function buildStrip(afterEl){
+    const wrap = document.createElement("div");
+    wrap.className = "container";
+    wrap.innerHTML = '<div class="ad-strip" aria-label="विज्ञापन"><a href="#" id="adStripLink"><span class="ad-tag">विज्ञापन</span><span id="adStripText"></span></a></div>';
+    afterEl.after(wrap);
+    const link = wrap.querySelector("#adStripLink"), txt = wrap.querySelector("#adStripText");
+    let i = 0;
+    const show = ()=>{ const a=ADS[i%ADS.length]; link.href=a.href; txt.textContent=a.title+" — "+a.text; i++; };
+    show(); setInterval(show,5000);
+  }
+  function buildVideoAd(beforeEl){
+    const sec = document.createElement("section");
+    sec.className = "video-ad-sec";
+    sec.setAttribute("aria-label","वीडियो विज्ञापन");
+    sec.innerHTML = '<div class="container"><div class="center reveal visible"><span class="eyebrow">वीडियो</span><h2>वीडियो विज्ञापन</h2></div>'
+      + '<div class="video-ad"><span class="ad-tag">विज्ञापन • Demo</span>'
+      + '<video controls preload="none" poster="https://images.unsplash.com/photo-1485846234645-a62644f84728?w=1000&q=80&auto=format&fit=crop">'
+      + '<source src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" type="video/mp4">'
+      + 'आपका ब्राउज़र वीडियो नहीं चला सकता।</video>'
+      + '<p class="hint">Demo वीडियो विज्ञापन — ग्राहक का असली प्रचार वीडियो मिलते ही बदला जाएगा (CMS editable)।</p></div></div>';
+    beforeEl.before(sec);
+  }
+  const isHome = (path === "index.html");
+  const trustEl = document.querySelector(".trust");
+  if(isHome && trustEl) buildSlider(trustEl);
+  const footerEl = document.querySelector("footer");
+  if(isHome && footerEl) buildVideoAd(footerEl);
+  const pageHero = document.querySelector(".page-hero");
+  if(pageHero && !isHome && !document.querySelector(".ad-strip")) buildStrip(pageHero);
 
   // News filter + search
   const chips = $$(".chip[data-filter]");

@@ -1,0 +1,20 @@
+{
+  "organization": {
+    "name": "जर्नलिस्ट सेवा परिषद",
+    "tagline": "पत्रकारों का राष्ट्रीय संगठन जो पत्रकारों के हितों के लिए कार्य कर रहा है",
+    "phone_display": "8318168274",
+    "phone_tel": "tel:8318168274",
+    "whatsapp": "https://wa.me/918318168274",
+    "address": "100A शताब्दी रोड, रतनपुर विस्तार, पनकी, कानपुर, उत्तर प्रदेश",
+    "pin": "208020",
+    "full_address": "100A शताब्दी रोड, रतनपुर विस्तार, पनकी, कानपुर, उत्तर प्रदेश 208020"
+  },
+  "editable_placeholders": {
+    "about": "EDITABLE: about content",
+    "activities": "EDITABLE: add real activities via CMS — currently placeholders only",
+    "news": "EDITABLE: replace demo placeholder articles with real updates",
+    "gallery": "EDITABLE: replace stock images with real organization photos when available",
+    "office_bearers": "EDITABLE: do not publish until officially supplied",
+    "social_links": "EDITABLE: add only verified URLs, else hide icons"
+  }
+}

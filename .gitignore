@@ -1,0 +1,3 @@
+# Admin panel runtime (passwords + sessions + backups — never commit)
+admin/data.json
+admin/backups/

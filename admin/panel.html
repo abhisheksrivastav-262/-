@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel | जर्नलिस्ट सेवा परिषद</title>
+<style>
+:root{--navy:#0a1a3c;--royal:#1740a8;--gold:#c9a227;--bg:#f2f4f9;--card:#fff;--line:#e2e7f2;--ink:#1a1e26;--mut:#5b6474;--ok:#1faa55;--bad:#d33}
+*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans Devanagari",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+a{color:var(--royal)}
+#loginView{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,var(--navy),var(--royal))}
+.login-card{background:#fff;border-radius:18px;padding:36px;width:min(420px,100%);box-shadow:0 30px 80px rgba(0,0,0,.4)}
+.login-card h1{color:var(--navy);margin:0 0 4px;font-size:1.4rem}.login-card p{color:var(--mut);margin:0 0 20px}
+#app{display:none}
+.topbar{position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 16px}
+.topbar b{font-size:1rem}.topbar .sp{flex:1}
+.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:700;font-family:inherit;cursor:pointer;font-size:.92rem}
+.btn-p{background:var(--gold);color:#1a1a1a}.btn-b{background:var(--royal);color:#fff}.btn-g{background:#eef1f7;color:var(--navy)}.btn-r{background:var(--bad);color:#fff}.btn-s{background:var(--ok);color:#fff}
+.btn-sm{padding:7px 12px;font-size:.84rem}
+.shell{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 53px)}
+.side{background:#fff;border-right:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:4px}
+.side a{display:block;text-decoration:none;color:var(--ink);font-weight:700;padding:11px 13px;border-radius:10px;font-size:.94rem}
+.side a.on,.side a:hover{background:#eaf0ff;color:var(--royal)}
+.side .grp{font-size:.72rem;font-weight:800;letter-spacing:.08em;color:var(--mut);padding:12px 13px 4px}
+.main{padding:22px;max-width:1100px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:18px}
+.card h2{margin:0 0 6px;color:var(--navy);font-size:1.25rem}.card h3{color:var(--navy);margin:22px 0 10px}
+.mut{color:var(--mut);font-size:.9rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.stat{background:linear-gradient(135deg,var(--navy),var(--royal));color:#fff;border-radius:14px;padding:18px}
+.stat b{font-size:1.8rem;display:block}.stat span{font-size:.85rem;opacity:.85}
+label.f{display:block;font-weight:700;margin:14px 0 6px;color:var(--navy);font-size:.92rem}
+input[type=text],input[type=password],input[type=number],select,textarea{width:100%;font:inherit;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fbfcff}
+textarea{min-height:90px;resize:vertical}
+table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--navy)}tr:hover td{background:#f7f9ff}
+img.th{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.badge{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:99px;background:#eaf0ff;color:var(--royal)}
+.badge.off{background:#f1e3e3;color:var(--bad)}.badge.new{background:#dff5e7;color:var(--ok)}
+.rowbtns{display:flex;gap:6px;flex-wrap:wrap}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:13px 24px;border-radius:99px;font-weight:700;display:none;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:92%}
+.modal{position:fixed;inset:0;background:rgba(4,8,20,.7);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal.open{display:flex}.modal .box{background:#fff;border-radius:16px;padding:26px;width:min(640px,100%);max-height:90vh;overflow:auto}
+.media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.media-grid figure{margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.media-grid img,.media-grid video{width:100%;height:120px;object-fit:cover;display:block;background:#000}
+.media-grid figcaption{font-size:.72rem;padding:8px;word-break:break-all}
+.help ol li{margin-bottom:10px}
+@media(max-width:760px){.shell{grid-template-columns:1fr}.side{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}.side a{white-space:nowrap}.side .grp{display:none}.main{padding:14px}.topbar{flex-wrap:wrap}}
+</style>
+</head>
+<body>
+
+<div id="loginView">
+  <div class="login-card">
+    <h1>🔐 Admin Login</h1>
+    <p>जर्नलिस्ट सेवा परिषद — Website Control Panel</p>
+    <label class="f">Username</label><input type="text" id="liUser" value="admin" autocomplete="username">
+    <label class="f">Password</label><input type="password" id="liPass" value="admin123" autocomplete="current-password">
+    <div style="margin-top:18px;display:flex;gap:10px"><button class="btn btn-b" style="flex:1" onclick="doLogin()">Login →</button></div>
+    <p class="mut" style="margin:14px 0 0">Default: <b>admin / admin123</b> — पहले login पर password बदलना जरूरी है।</p>
+    <p id="liErr" style="color:var(--bad);font-weight:700"></p>
+  </div>
+</div>
+
+<div id="app">
+  <div class="topbar">
+    <b>📰 JSP Admin</b><span class="badge" id="roleBadge">-</span><span class="sp"></span>
+    <button class="btn btn-sm" id="apBtn" style="background:#ffffff33;color:#fff" onclick="toggleAP()">🚀 Auto: ON</button>
+    <button class="btn btn-g btn-sm" onclick="window.open('/','_blank')">🌐 Site</button>
+    <button class="btn btn-g btn-sm" onclick="doPreview()">👁 Preview</button>
+    <button class="btn btn-p btn-sm" onclick="doPublish()">🚀 Publish</button>
+    <button class="btn btn-sm" style="background:#ffffff33;color:#fff" onclick="doLogout()">Logout</button>
+  </div>
+  <div class="shell">
+    <nav class="side" id="sideNav"></nav>
+    <div class="main" id="view"></div>
+  </div>
+</div>
+
+<div class="modal" id="modal"><div class="box" id="modalBox"></div></div>
+<div id="toast"></div>
+
+<script>
+let ME=null, DATA=null, USERS=[], INBOX=[], MEDIA=[];
+const $=s=>document.querySelector(s);
+function toast(m){ const t=$("#toast"); t.textContent=m; t.style.display="block"; clearTimeout(t._h); t._h=setTimeout(()=>t.style.display="none",2800); }
+async function api(url,opt={}){
+  const r=await fetch(url,{headers:{"Content-Type":"application/json"},...opt});
+  const d=await r.json().catch(()=>({}));
+  if(r.status===401){ try{toast("Session खत्म — dobara login करें")}catch(_){} location.hash=""; setTimeout(()=>location.reload(),900); throw new Error("login"); }
+  if(!r.ok) throw new Error(d.error||("Error "+r.status));
+  return d;
+}
+/* ---------- auto-publish (Save = LIVE) ---------- */
+let AUTOPUB=localStorage.getItem("jsp_autopub")!=="0";
+function paintAP(){ const b=$("#apBtn"); if(b) b.textContent=AUTOPUB?"🚀 Auto: ON":"⏸ Auto: OFF"; }
+function toggleAP(){ AUTOPUB=!AUTOPUB; localStorage.setItem("jsp_autopub",AUTOPUB?"1":"0"); paintAP(); toast(AUTOPUB?"Auto-publish ON — Save करते ही LIVE":"Auto-publish OFF — Publish दबाना होगा"); }
+async function autoPub(){
+  if(!AUTOPUB) return;
+  try{ await api("/api/publish",{method:"POST"}); await reloadData(); toast("🎉 Website पर LIVE हो गया!"); }
+  catch(e){ toast("Publish failed: "+e.message); }
+}
+async function doLogin(){
+  try{ const d=await api("/api/login",{method:"POST",body:JSON.stringify({user:$("#liUser").value,pass:$("#liPass").value})});
+    ME={user:d.user,role:d.role}; enterApp(d.mustChange);
+  }catch(e){ $("#liErr").textContent=e.message; }
+}
+async function doLogout(){ await api("/api/logout",{method:"POST"}); location.reload(); }
+async function enterApp(mustChange){
+  $("#loginView").style.display="none"; $("#app").style.display="block";
+  $("#roleBadge").textContent=ME.role; paintAP();
+  await reloadData(); nav();
+  window.addEventListener("hashchange",nav);
+  setInterval(async()=>{ try{ await api("/api/me"); }catch(e){} },4*60*1000); // heartbeat: session alive rahe
+  if(mustChange) openModal(`<h2>🔑 Password बदलें (जरूरी)</h2><p class="mut">पहली बार login पर नया password सेट करें।</p>
+    <label class="f">पुराना password</label><input type="password" id="pwOld">
+    <label class="f">नया password</label><input type="password" id="pwNew">
+    <div style="margin-top:16px"><button class="btn btn-b" onclick="changePw(true)">Save →</button></div>`);
+}
+async function reloadData(){ try{ DATA=await api("/api/data"); }catch(e){ toast("Data load नहीं हुआ — दोबारा login करें"); setTimeout(()=>location.reload(),1500); throw e; } }
+async function changePw(first){
+  try{ await api("/api/password",{method:"POST",body:JSON.stringify({old:$("#pwOld").value,new:$("#pwNew").value})});
+    closeModal(); toast("Password बदल गया ✓");
+  }catch(e){ toast(e.message); }
+}
+function openModal(h){ $("#modalBox").innerHTML=h; $("#modal").classList.add("open"); }
+function closeModal(){ $("#modal").classList.remove("open"); }
+$("#modal").addEventListener("click",e=>{ if(e.target.id==="modal") closeModal(); });
+
+/* ---------- NAV (har page alag) ---------- */
+const NAV=[
+ ["home","🏠 होम"],["about","ℹ️ हमारे बारे में"],["welfare","⚖️ पत्रकार हित"],["membership","📝 सदस्यता"],
+ ["activities","📅 गतिविधियां"],["news","📰 समाचार"],["gallery","🖼 मीडिया गैलरी"],["contact","📞 संपर्क"],
+ ["grp2","⚙️ SYSTEM"],
+ ["ads","📢 Ads"],["donate","❤️ Donate"],["media","📁 Media"],["inbox","📥 Inbox"],["users","👥 Users"],["backups","💾 Backup"],["help","❓ Help"]
+];
+const VIEWS={home:vHome,about:vAbout,welfare:vWelfare,membership:vMembership,news:vNewsPage,activities:vActivitiesPage,gallery:vGalleryPage,contact:vContact,ads:vAds,donate:vDonate,media:vMedia,inbox:vInbox,users:vUsers,backups:vBackups,help:vHelp};
+function nav(){
+  const v=(location.hash||"#home").slice(1);
+  $("#sideNav").innerHTML=NAV.map(n=>n[0].startsWith("grp")?`<div class="grp">${n[1]}</div>`:`<a href="#${n[0]}" class="${v===n[0]?'on':''}">${n[1]}</a>`).join("");
+  (VIEWS[v]||vHome)();
+}
+function fld(id,val,type,label){
+  const v=(val!==undefined&&val!=="")?val:"";
+  return `<label class="f">${label}</label>`+(type==="textarea"?`<textarea data-f="${id}">${v.replace(/</g,"&lt;")}</textarea>`:`<input type="text" data-f="${id}" value="${v.replace(/"/g,"&quot;")}">`);
+}
+function fld2(k,v,label){ return `<label class="f">${label}</label><input type="text" data-k="${k}" value="${(v??"").replace(/"/g,"&quot;")}">`; }
+function gFld(key,val,label){ return `<label class="f">${label}</label><input type="text" data-g="${key}" value="${(val??"").replace(/"/g,"&quot;")}">`; }
+async function saveFields(){
+  for(const el of document.querySelectorAll("[data-f]")){ await api("/api/save",{method:"POST",body:JSON.stringify({kind:"field",id:el.dataset.f,value:el.value})}); }
+  for(const el of document.querySelectorAll("[data-g]")){ await api("/api/save",{method:"POST",body:JSON.stringify({kind:"globals",id:el.dataset.g,value:el.value})}); }
+  for(const el of document.querySelectorAll("[data-seo]")){ const [f,k]=el.dataset.seo.split("|"); DATA.seo[f]=DATA.seo[f]||{}; DATA.seo[f][k]=el.value; }
+  for(const f in (DATA.seo||{})) await api("/api/save",{method:"POST",body:JSON.stringify({kind:"seo",id:f,value:DATA.seo[f]})});
+  await reloadData(); toast("Saved ✓"); autoPub();
+}
+const PAGE_FILE={Home:"index.html",About:"about.html",Welfare:"journalist-welfare.html",Membership:"membership.html",News:"news.html",Activities:"activities.html",Gallery:"gallery.html",Contact:"contact.html"};
+function pageFieldsHTML(page){
+  const defs=DATA.fieldDefs.filter(f=>f.page===page);
+  const secs={}; defs.forEach(f=>{ (secs[f.section]=secs[f.section]||[]).push(f); });
+  let h="";
+  Object.keys(secs).forEach(s=>{ h+=`<h3>${s}</h3>`; secs[s].forEach(f=>{ h+=fld(f.id,f.current,f.type,f.label+` <span class="mut">(${f.file})</span>`); }); });
+  const sf=PAGE_FILE[page];
+  if(sf&&DATA.seo[sf]){ h+=`<h3>🔍 SEO (${sf})</h3><label class="f">Meta title</label><input type="text" data-seo="${sf}|title" value="${(DATA.seo[sf].title||"").replace(/"/g,"&quot;")}"><label class="f">Meta description</label><textarea data-seo="${sf}|desc">${(DATA.seo[sf].desc||"").replace(/</g,"&lt;")}</textarea>`; }
+  h+=`<div style="margin-top:16px"><button class="btn btn-s" onclick="saveFields()">💾 Save${AUTOPUB?" (auto-live 🚀)":""}</button></div>`;
+  return h;
+}
+
+/* ---------- DASHBOARD ---------- */
+function vDashboard(){
+  const L=DATA.lists;
+  $("#view").innerHTML=`<div class="card"><h2>📊 Dashboard</h2><p class="mut">नमस्ते, <b>${ME.user}</b> (${ME.role}) — Auto-publish ${AUTOPUB?"<b>ON</b> है: Save = LIVE":"<b>OFF</b> है: Publish दबाएं"}।</p></div>
+  <div class="grid">
+    <div class="stat"><b>10</b><span>Pages</span></div>
+    <div class="stat"><b>${L.leaders.length}</b><span>नेतृत्व</span></div>
+    <div class="stat"><b>${L.news.length}</b><span>समाचार</span></div>
+    <div class="stat"><b>${L.activities.length}</b><span>गतिविधियां</span></div>
+    <div class="stat"><b>${L.gallery.length}</b><span>गैलरी photos</span></div>
+    <div class="stat"><b>${L.ads.length}</b><span>विज्ञापन</span></div>
+  </div>
+  <div class="card" style="margin-top:18px"><h2>⚡ Quick Add (har page ke liye)</h2>
+    <div class="rowbtns"><a class="btn btn-b btn-sm" href="#news">+ समाचार</a><a class="btn btn-b btn-sm" href="#gallery">+ फोटो</a><a class="btn btn-b btn-sm" href="#home">+ नेता</a><a class="btn btn-b btn-sm" href="#activities">+ गतिविधि</a><a class="btn btn-b btn-sm" href="#media">Media upload</a><a class="btn btn-b btn-sm" href="#inbox">Inbox</a></div>
+    <h3>Global Settings</h3>
+    ${gFld("phone",DATA.globals.phone,"📞 Phone / Call number")}
+    ${gFld("email",DATA.globals.email,"✉️ Email ID")}
+    ${gFld("wa",DATA.globals.wa,"💬 WhatsApp number (country code सहित)")}
+    ${gFld("addrKanpur",DATA.globals.addrKanpur,"📍 Kanpur address")}
+    ${gFld("addrMumbai",DATA.globals.addrMumbai,"🏢 Mumbai National Office")}
+    ${fld("foot_about",(DATA.fieldDefs.find(f=>f.id==="foot_about")||{}).current,"input","Footer about text (all pages)")}
+    <div style="margin-top:14px"><button class="btn btn-s" onclick="saveFields()">💾 Save</button></div>
+  </div>`;
+}
+
+/* ---------- per-page views ---------- */
+function vHome(){ $("#view").innerHTML=`<div class="card"><h2>🏠 होम</h2><p class="mut">Hero, video, trust, about, welfare, event, CTA — text यहीं edit करें। नीचे नेतृत्व table से photo/नाम add करें।</p>${pageFieldsHTML("Home")}</div>`+listTableHTML("🧑‍💼 नेतृत्व add करें (Home + About grids)","leaders",LEAD_COLS); }
+function vAbout(){ $("#view").innerHTML=`<div class="card"><h2>ℹ️ हमारे बारे में</h2><p class="mut">Intro, values, CTA text।</p>${pageFieldsHTML("About")}</div>`+listTableHTML("🧑‍💼 नेतृत्व add करें (Home + About grids)","leaders",LEAD_COLS); }
+function vWelfare(){ $("#view").innerHTML=`<div class="card"><h2>⚖️ पत्रकार हित</h2>${pageFieldsHTML("Welfare")}</div>`; }
+function vMembership(){ $("#view").innerHTML=`<div class="card"><h2>📝 सदस्यता</h2><p class="mut">Hero, form heading, donate box labels। QR बदलने के लिए ❤️ Donate page।</p>${pageFieldsHTML("Membership")}</div>`; }
+function vNewsPage(){ $("#view").innerHTML=`<div class="card"><h2>📰 समाचार</h2>${pageFieldsHTML("News")}</div>`+listTableHTML("📰 समाचार add करें","news",NEWS_COLS)+`<div class="card"><h2>🏷 Categories</h2>${CATLIST("newsCats","News categories")}</div>`; }
+function vActivitiesPage(){ $("#view").innerHTML=`<div class="card"><h2>📅 गतिविधियां</h2>${pageFieldsHTML("Activities")}</div>`+listTableHTML("📅 गतिविधि add करें","activities",ACT_COLS)+`<div class="card"><h2>🏷 Categories</h2>${CATLIST("actCats","Activity categories")}</div>`; }
+function vGalleryPage(){ $("#view").innerHTML=`<div class="card"><h2>🖼 मीडिया गैलरी</h2>${pageFieldsHTML("Gallery")}</div>`+listTableHTML("🖼 फोटो add करें","gallery",GAL_COLS)+`<div class="card"><h2>🏷 Categories</h2>${CATLIST("galCats","Gallery categories")}</div>`; }
+function vContact(){ $("#view").innerHTML=`<div class="card"><h2>📞 संपर्क</h2><p class="mut">Title, form heading, map note — और नीचे पूरी website के पते/नंबर।</p>${pageFieldsHTML("Contact")}</div>`
++`<div class="card"><h2>⚙️ Global Settings (पूरी website पर लागू)</h2>
+${gFld("phone",DATA.globals.phone,"📞 Phone / Call number")}
+${gFld("wa",DATA.globals.wa,"💬 WhatsApp number (country code सहित)")}
+${gFld("addrKanpur",DATA.globals.addrKanpur,"📍 Kanpur address")}
+${gFld("addrMumbai",DATA.globals.addrMumbai,"🏢 Mumbai National Office")}
+${fld("foot_about",(DATA.fieldDefs.find(f=>f.id==="foot_about")||{}).current,"input","Footer about text (all pages)")}
+<div style="margin-top:14px"><button class="btn btn-s" onclick="saveFields()">💾 Save</button></div></div>`; }
+
+/* ---------- list tables (shared) ---------- */
+const FORMS={leaders:formLeader,news:formNews,activities:formAct,gallery:formGal,ads:formAd};
+const LEAD_COLS=[["cap","Photo / नाम"],["full","Full-frame?",it=>it.full?"yes":"no"],["","Status",actBadge]];
+const NEWS_COLS=[["img","Img",imgCell],["title","Title"],["cat","Category"],["tag","Tag"],["","Status",actBadge]];
+const ACT_COLS=[["title","Title"],["cat","Category"],["date","Date"],["","Status",actBadge]];
+const GAL_COLS=[["img","Img",imgCell],["cap","Caption"],["cat","Category"],["","Status",actBadge]];
+const AD_COLS=[["title","Title"],["label","Badge"],["theme","Theme"],["href","Link"]];
+function formLeader(it){ return `${fld2("img",it.img,"Image path (नीचे Upload से auto-भरेगा)")}${fld2("naam",it.naam,"नाम * (जैसे — आलोक दुवेदी)")}${fld2("pad",it.pad,"पद * (जैसे — प्रभारी उत्तर प्रदेश जर्नलिस्ट सेवा परिषद)")}${fld2("alt",it.alt,"Alt text")}${fld2("cap",it.cap,"Caption (खाली छोड़ें = पद + नाम से auto-बनेगा)")}<label class="f">Full-frame photo (बिना कटे)? <input type="checkbox" data-k="full" ${it.full?"checked":""}></label><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function formNews(it){ return `${fld2("img",it.img,"Image path (नीचे Upload से auto-भरेगा)")}${fld2("cat",it.cat,"Category value (english, जैसे event)")}${fld2("tag",it.tag,"Tag label (Hindi)")}${fld2("title",it.title,"Title")}${fld2("share",it.share,"Share button title (short)")}${fld2("date",it.date,"Date line")}${fld2("alt",it.alt,"Alt")}<label class="f">Description</label><textarea data-k="desc">${it.desc||""}</textarea><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function formAct(it){ return `${fld2("img",it.img||"","Photo (optional — नीचे Upload से auto-भरेगा)")}${fld2("cat",it.cat,"Category value")}${fld2("tag",it.tag,"Tag label")}${fld2("title",it.title,"Title")}${fld2("date",it.date,"Date (जैसे तिथि TB*)")}${fld2("place",it.place,"Place")}${fld2("meta",it.meta,"Meta line")}<label class="f">Description</label><textarea data-k="desc">${it.desc||""}</textarea><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function formGal(it){ return `${fld2("img",it.img,"Image path (नीचे Upload से auto-भरेगा)")}${fld2("cat",it.cat,"Category value")}${fld2("alt",it.alt,"Alt")}${fld2("cap",it.cap,"Caption")}<label class="f">Tall frame? <input type="checkbox" data-k="tall" ${it.tall?"checked":""}></label><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function formAd(it){ return `${fld2("label",it.label,"Badge (विज्ञापन / Demo)")}${fld2("title",it.title,"Title")}<label class="f">Text</label><textarea data-k="text">${it.text||""}</textarea>${fld2("cta",it.cta,"Button text")}${fld2("href",it.href,"Button link")}${fld2("theme",it.theme,"Theme (house/t1/t2)")}`; }
+function listTableHTML(title,key,cols){
+  const items=DATA.lists[key];
+  return `<div class="card"><h2>${title}</h2><p class="mut">${AUTOPUB?"Save करते ही LIVE होगा 🚀":"Save के बाद Publish दबाएं"}। Order: ▲▼।</p>
+  <div style="margin:10px 0"><button class="btn btn-b btn-sm" onclick="editItem('${key}',-1)">+ नया जोड़ें</button></div>
+  <div style="overflow-x:auto"><table><tr><th>#</th>${cols.map(c=>`<th>${c[1]}</th>`).join("")}<th>Action</th></tr>
+  ${items.map((it,i)=>`<tr><td>${i+1}</td>${cols.map(c=>`<td>${c[2]?c[2](it):(it[c[0]]||"")}</td>`).join("")}
+  <td><div class="rowbtns"><button class="btn btn-g btn-sm" onclick="editItem('${key}',${i})">Edit</button><button class="btn btn-g btn-sm" onclick="moveItem('${key}',${i},-1)">▲</button><button class="btn btn-g btn-sm" onclick="moveItem('${key}',${i},1)">▼</button><button class="btn btn-r btn-sm" onclick="delItem('${key}',${i})">Del</button></div></td></tr>`).join("")}
+  </table></div></div>`;
+}
+window.editItem=function(key,i){
+  const it=i<0?{}:DATA.lists[key][i];
+  const secName={leaders:"नेतृत्व",news:"समाचार",activities:"गतिविधि",gallery:"गैलरी फोटो",ads:"विज्ञापन"}[key]||key;
+  openModal(`<h2>${i<0?("+ "+secName+" जोड़ें"):"Edit — "+secName}</h2><p class="mut">भरो → Save = website पर LIVE 🚀</p>${FORMS[key](it)}
+  <div style="margin-top:18px;display:grid;gap:10px"><button class="btn btn-s" style="padding:15px;font-size:1.05rem" onclick="saveItem('${key}',${i})">💾 Save — LIVE करें</button><button class="btn btn-g" onclick="closeModal()">Cancel</button></div>`);
+  attachImgUploads();
+};
+window.saveItem=async function(key,i){
+  const o=i<0?{active:true}:DATA.lists[key][i];
+  document.querySelectorAll("#modalBox [data-k]").forEach(el=>{ o[el.dataset.k]=el.type==="checkbox"?el.checked:el.value; });
+  if(key==="leaders"&&(((o.naam||"").trim()||(o.pad||"").trim()))){ o.cap=(((o.pad||"").trim()+" "+(o.naam||"").trim()).trim()); if(!o.alt) o.alt=o.cap; }
+  if(i<0) DATA.lists[key].push(o);
+  await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:key,value:DATA.lists[key]})});
+  closeModal(); nav(); toast("Saved ✓"); autoPub();
+};
+window.delItem=async function(key,i){
+  if(!confirm("Delete करें?")) return;
+  DATA.lists[key].splice(i,1);
+  await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:key,value:DATA.lists[key]})});
+  nav(); toast("Deleted ✓"); autoPub();
+};
+window.moveItem=async function(key,i,d){
+  const a=DATA.lists[key]; const j=i+d; if(j<0||j>=a.length) return;
+  [a[i],a[j]]=[a[j],a[i]];
+  await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:key,value:a})});
+  nav(); autoPub();
+};
+const imgCell=it=>it.img?`<img class="th" src="/${it.img}">`:"-";
+const actBadge=it=>it.active===false?'<span class="badge off">hidden</span>':'<span class="badge">live</span>';
+function vAds(){
+  $("#view").innerHTML=listTableHTML("📢 विज्ञापन Slides","ads",AD_COLS)
+  +`<div class="card"><h2>🏷 Category Chips</h2><p class="mut">नई category यहां जोड़ें — chips अपने-आप बनेंगे।</p>${CATLIST("newsCats","News categories")+CATLIST("actCats","Activity categories")+CATLIST("galCats","Gallery categories")}</div>`;
+}
+function CATLIST(key,title){
+  const items=DATA.lists[key];
+  return `<h3>${title}</h3><table>${items.map((c,i)=>`<tr><td>${c.value}</td><td>${c.label}</td><td><button class="btn btn-r btn-sm" onclick="delCat('${key}',${i})">Del</button></td></tr>`).join("")}</table>
+  <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap"><input type="text" id="cv-${key}" placeholder="value (english)" style="flex:1;min-width:140px"><input type="text" id="cl-${key}" placeholder="Label (Hindi)" style="flex:1;min-width:140px"><button class="btn btn-b btn-sm" onclick="addCat('${key}')">+ Add</button></div>`;
+}
+window.addCat=async function(key){
+  const v=$("#cv-"+key).value.trim(), l=$("#cl-"+key).value.trim();
+  if(!v||!l){ toast("value + label दोनों भरें"); return; }
+  DATA.lists[key].push({value:v,label:l});
+  await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:key,value:DATA.lists[key]})});
+  nav(); toast("Added ✓"); autoPub();
+};
+window.delCat=async function(key,i){
+  if(!confirm("Category हटाएं?")) return;
+  DATA.lists[key].splice(i,1);
+  await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:key,value:DATA.lists[key]})});
+  nav(); autoPub();
+};
+
+/* ---------- MEDIA ---------- */
+async function vMedia(){
+  MEDIA=(await api("/api/media")).files;
+  $("#view").innerHTML=`<div class="card"><h2>📁 Media Library</h2>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+    <select id="upFolder"><option value="gallery">gallery</option><option value="leaders">leaders</option><option value="video">video (mp4)</option><option value="misc">misc</option></select>
+    <input type="file" id="upFile" accept="image/*,video/mp4"><button class="btn btn-b btn-sm" onclick="doUpload()">⬆ Upload</button>
+  </div><p class="mut">Upload करते ही <b>नाम/Caption भरकर सीधे page पर लगाएं</b> — Save = LIVE। Delete से पहले usage check करें।</p>
+  <div class="media-grid">${MEDIA.map((f,i)=>`<figure>${f.path.endsWith(".mp4")?`<video src="/${f.path}" preload="metadata"></video>`:`<img src="/${f.path}" loading="lazy">`}<figcaption>${f.path}<br>${(f.size/1024).toFixed(0)} KB<br><button class="btn btn-g btn-sm" onclick="copyPath('${f.path}')">Copy</button> <button class="btn btn-b btn-sm" onclick="openPlace('${f.path}')">➕ लगाएं</button> <button class="btn btn-r btn-sm" onclick="delMedia('${f.path}')">Del</button></figcaption></figure>`).join("")}</div></div>`;
+}
+window.copyPath=p=>{ navigator.clipboard.writeText(p); toast("Copied: "+p); };
+window.doUpload=async function(){
+  const f=$("#upFile").files[0]; if(!f){ toast("File चुनें"); return; }
+  toast("Uploading…");
+  const buf=await f.arrayBuffer();
+  let b64=""; const bytes=new Uint8Array(buf); for(let i=0;i<bytes.length;i+=0x8000) b64+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
+  const mime=f.type==="video/mp4"?"video/mp4":f.type==="image/png"?"image/png":f.type==="image/webp"?"image/webp":f.type==="image/svg+xml"?"image/svg+xml":"image/jpeg";
+  try{ const d=await api("/api/upload",{method:"POST",body:JSON.stringify({name:f.name,folder:$("#upFolder").value,data:`data:${mime};base64,${btoa(b64)}`})});
+    toast("Uploaded ✓"); vMedia(); openPlace(d.path);
+  }catch(e){ toast(e.message); }
+};
+window.delMedia=async function(p){
+  const u=await api("/api/media-usage?path="+encodeURIComponent(p));
+  if(u.uses.length && !confirm(`⚠ Ye file in pages me use ho rahi: ${u.uses.join(", ")} — फिर भी delete?`)) return;
+  await api("/api/media-delete",{method:"POST",body:JSON.stringify({path:p})});
+  toast("Deleted ✓"); vMedia(); autoPub();
+};
+
+/* ---------- DIRECT IMAGE UPLOAD inside every form ---------- */
+function attachImgUploads(){
+  document.querySelectorAll('#modalBox input[data-k="img"]').forEach(inp=>{
+    if(inp.dataset.hasUp) return; inp.dataset.hasUp="1";
+    const box=document.createElement("div");
+    box.style.cssText="border:2px dashed var(--royal);border-radius:12px;padding:14px;margin:10px 0;background:#f4f7ff";
+    box.innerHTML=`<b>📷 Photo upload करें (Choose File)</b><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center"><input type="file" accept="image/*" style="flex:1;min-width:160px"><select style="flex:0 0 120px"><option value="gallery">gallery</option><option value="leaders">leaders</option><option value="misc">misc</option></select><button type="button" class="btn btn-b">⬆ Upload</button></div><div class="prev" style="margin-top:8px"></div>`;
+    const sel=box.querySelector("select"), fi=box.querySelector('input[type="file"]'), btn=box.querySelector("button"), prev=box.querySelector(".prev");
+    if(inp.value) prev.innerHTML=`<img src="/${inp.value}" style="max-width:100%;max-height:160px;border-radius:10px">`;
+    btn.onclick=async ()=>{
+      const f=fi.files[0]; if(!f){ toast("पहले Choose File से photo चुनें"); return; }
+      btn.textContent="…";
+      try{
+        const buf=await f.arrayBuffer();
+        let b64=""; const bytes=new Uint8Array(buf);
+        for(let i=0;i<bytes.length;i+=0x8000) b64+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
+        const mime=f.type==="image/png"?"image/png":f.type==="image/webp"?"image/webp":"image/jpeg";
+        const d=await api("/api/upload",{method:"POST",body:JSON.stringify({name:f.name,folder:sel.value,data:`data:${mime};base64,${btoa(b64)}`})});
+        inp.value=d.path; prev.innerHTML=`<img src="/${d.path}" style="max-width:100%;max-height:160px;border-radius:10px">`; toast("Uploaded ✓ — path भर गया");
+      }catch(e){ toast(e.message); }
+      btn.textContent="⬆ Upload";
+    };
+    inp.before(box);
+  });
+}
+
+/* ---------- PLACE ON WEBSITE (upload + naam/pad → Save = LIVE) ---------- */
+window.openPlace=function(p){
+  const isVid=p.endsWith(".mp4");
+  openModal(`<h2>➕ Website पर लगाएं</h2><p class="mut">${p}</p>
+  <div style="text-align:center;margin:10px 0">${isVid?`<video src="/${p}" style="max-width:100%;max-height:200px" controls></video>`:`<img src="/${p}" style="max-width:100%;max-height:200px;border-radius:10px">`}</div>
+  <label class="f">कहां लगाएं? *</label><select id="pl-sec" onchange="plFields()"><option value="leaders">🧑‍💼 नेतृत्व (Home + About)</option><option value="gallery">🖼 गैलरी</option><option value="news">📰 समाचार</option><option value="activities">📅 गतिविधियां</option></select>
+  <div id="pl-fields"></div>
+  <div style="margin-top:16px;display:flex;gap:10px"><button class="btn btn-s" onclick="savePlace('${p}')">💾 Save + Publish (LIVE!)</button><button class="btn btn-g" onclick="closeModal()">Cancel</button></div>`);
+  plFields();
+};
+window.plFields=function(){
+  const s=$("#pl-sec").value;
+  let h=`<label class="f">नाम / Caption *</label><input type="text" id="pl-cap" placeholder="जैसे — प्रभारी ...">`;
+  if(s==="news"||s==="activities"||s==="gallery"){ h+=`<label class="f">Category (english value)</label><input type="text" id="pl-cat" value="event">`; }
+  if(s==="news"){ h+=`<label class="f">Tag (Hindi)</label><input type="text" id="pl-tag" value="संगठन समाचार"><label class="f">Date line</label><input type="text" id="pl-date" value="नया अपडेट"><label class="f">Description</label><textarea id="pl-desc"></textarea>`; }
+  if(s==="activities"){ h+=`<label class="f">Tag (Hindi)</label><input type="text" id="pl-tag" value="कार्यक्रम"><label class="f">Date</label><input type="text" id="pl-date" value="तिथि TB*"><label class="f">Place</label><input type="text" id="pl-place" value="स्थान TB*"><label class="f">Description</label><textarea id="pl-desc"></textarea>`; }
+  if(s==="leaders"){ h+=`<label class="f"><input type="checkbox" id="pl-full"> Full-frame photo (बिना कटे)?</label>`; }
+  if(s==="gallery"){ h+=`<label class="f"><input type="checkbox" id="pl-tall"> Tall frame?</label>`; }
+  $("#pl-fields").innerHTML=h;
+};
+window.savePlace=async function(p){
+  const s=$("#pl-sec").value;
+  const cap=(($("#pl-cap")||{}).value||"").trim();
+  if(!cap){ toast("नाम / Caption भरें"); return; }
+  const d=await api("/api/data");
+  const item={img:p,alt:cap,active:true};
+  if(s==="leaders"){ Object.assign(item,{cap:cap,full:$("#pl-full").checked,w:480,h:544}); }
+  if(s==="gallery"){ Object.assign(item,{cap:cap,cat:$("#pl-cat").value||"event",tall:$("#pl-tall").checked}); }
+  if(s==="news"){ Object.assign(item,{cat:$("#pl-cat").value||"event",tag:$("#pl-tag").value,title:cap,date:$("#pl-date").value,desc:$("#pl-desc").value,share:cap}); }
+  if(s==="activities"){ Object.assign(item,{cat:$("#pl-cat").value||"event",tag:$("#pl-tag").value,title:cap,date:$("#pl-date").value,place:$("#pl-place").value,meta:"",desc:$("#pl-desc").value}); }
+  d.lists[s].push(item);
+  await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:s,value:d.lists[s]})});
+  closeModal(); toast("Publishing… 🚀");
+  try{ await api("/api/publish",{method:"POST"}); await reloadData(); toast("🎉 Website पर LIVE हो गया!"); }
+  catch(e){ toast(e.message); }
+};
+
+/* ---------- DONATE ---------- */
+function vDonate(){
+  $("#view").innerHTML=`<div class="card"><h2>❤️ दान Settings</h2><p class="mut">Membership page का donate box + QR यहीं से बदलें।</p>
+  <label class="f">Donate QR image path</label><input type="text" id="qrPath" value="">
+  <p class="mut">Media Library से QR upload करें (misc folder), path यहां paste करें, Save करें।</p>
+  <div class="rowbtns"><button class="btn btn-s" onclick="saveDonate()">💾 Save</button></div></div>`;
+}
+window.saveDonate=async function(){
+  const p=$("#qrPath").value.trim();
+  if(p){ await api("/api/save",{method:"POST",body:JSON.stringify({kind:"field",id:"mem_qr",value:`src="${p}"`})}); }
+  toast("Saved ✓"); autoPub();
+};
+
+/* ---------- INBOX ---------- */
+async function vInbox(){
+  INBOX=(await api("/api/inbox")).inbox;
+  $("#view").innerHTML=`<div class="card"><h2>📥 Form Inbox</h2><p class="mut">${INBOX.length} entries — WhatsApp के साथ-साथ यहां भी save होते हैं। <a href="/api/inbox.csv">CSV download</a></p>
+  <div style="overflow-x:auto"><table><tr><th>Date</th><th>Type</th><th>Name/Mobile</th><th>Detail</th><th>Status</th><th></th></tr>
+  ${INBOX.map(i=>{ const d=i.data||{}; return `<tr><td>${new Date(i.t).toLocaleString("en-IN")}</td><td><span class="badge">${i.type}</span></td>
+  <td><b>${d.name||"-"}</b><br>${d.mobile||""}${d.amount?"<br>₹"+d.amount:""}</td>
+  <td style="max-width:280px">${Object.entries(d).filter(([k])=>!["name","mobile"].includes(k)).map(([k,v])=>`${k}: ${v}`).join("<br>")}</td>
+  <td><select onchange="inboxStatus(${i.id},this.value)">${["new","contacted","done"].map(s=>`<option ${i.status===s?"selected":""}>${s}</option>`).join("")}</select></td>
+  <td><button class="btn btn-r btn-sm" onclick="inboxDel(${i.id})">Del</button></td></tr>`; }).join("")}</table></div></div>`;
+}
+window.inboxStatus=async(id,s)=>{ await api("/api/inbox/"+id,{method:"PATCH",body:JSON.stringify({status:s})}); toast("Updated ✓"); };
+window.inboxDel=async id=>{ if(!confirm("Delete?"))return; await api("/api/inbox/"+id,{method:"DELETE"}); vInbox(); };
+
+/* ---------- USERS ---------- */
+async function vUsers(){
+  if(ME.role!=="admin"){ $("#view").innerHTML=`<div class="card"><h2>👥 Users</h2><p class="mut">सिर्फ Super Admin देख सकते हैं।</p></div>`; return; }
+  USERS=(await api("/api/users")).users;
+  $("#view").innerHTML=`<div class="card"><h2>👥 Users & Roles</h2>
+  <table>${USERS.map(u=>`<tr><td><b>${u.user}</b></td><td>${u.role}</td><td><button class="btn btn-g btn-sm" onclick="editUser('${u.user}')">Role/Password</button></td></tr>`).join("")}</table>
+  <h3>+ नया user</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><input type="text" id="nu" placeholder="username" style="flex:1;min-width:140px"><input type="text" id="np" placeholder="password" style="flex:1;min-width:140px"><select id="nr"><option value="editor">editor</option><option value="admin">admin</option><option value="viewer">viewer</option></select><button class="btn btn-b btn-sm" onclick="saveUser(null)">Add</button></div></div>`;
+}
+window.editUser=u=>{ const x=USERS.find(y=>y.user===u);
+  openModal(`<h2>${u}</h2><label class="f">Role</label><select id="eu-role"><option ${x.role==="admin"?"selected":""}>admin</option><option ${x.role==="editor"?"selected":""}>editor</option><option ${x.role==="viewer"?"selected":""}>viewer</option></select><label class="f">नया password (खाली = न बदलें)</label><input type="text" id="eu-pass"><div style="margin-top:14px;display:flex;gap:8px"><button class="btn btn-s" onclick="saveUser('${u}')">Save</button><button class="btn btn-r" onclick="delUser('${u}')">Delete user</button><button class="btn btn-g" onclick="closeModal()">Cancel</button></div>`); };
+window.saveUser=async u=>{
+  const user=u||$("#nu").value.trim(), role=u?$("#eu-role").value:$("#nr").value, pass=u?$("#eu-pass").value:$("#np").value;
+  if(!user){ toast("username भरें"); return; }
+  await api("/api/user-save",{method:"POST",body:JSON.stringify({user,role,pass:pass||undefined})});
+  closeModal(); toast("Saved ✓"); vUsers();
+};
+window.delUser=async u=>{ if(!confirm(u+" को हटाएं?"))return; try{ await api("/api/user-delete",{method:"POST",body:JSON.stringify({user:u})}); closeModal(); vUsers(); }catch(e){ toast(e.message); } };
+
+/* ---------- BACKUPS ---------- */
+async function vBackups(){
+  const d=await api("/api/backups"); BACKUPS=d.backups;
+  $("#view").innerHTML=`<div class="card"><h2>💾 Backup & Activity</h2><p class="mut">हर Publish पर auto-backup बनता है (last 10)।</p>
+  ${BACKUPS.map(b=>`<div style="display:flex;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)"><span>📦 ${b}</span><span class="sp" style="flex:1"></span><button class="btn btn-g btn-sm" onclick="doRollback('${b}')">↩ Restore</button></div>`).join("")||"<p>कोई backup नहीं</p>"}
+  <h3>🔑 Password बदलें</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><input type="password" id="pwOld" placeholder="पुराना" style="flex:1;min-width:140px"><input type="password" id="pwNew" placeholder="नया" style="flex:1;min-width:140px"><button class="btn btn-b btn-sm" onclick="changePw()">Save</button></div>
+  <h3>📝 Recent activity</h3><table>${d.activity.map(a=>`<tr><td>${new Date(a.t).toLocaleString("en-IN")}</td><td><b>${a.user}</b></td><td>${a.action}</td></tr>`).join("")}</table></div>`;
+}
+window.doRollback=async b=>{ if(!confirm(b+" restore करें? Current state backup हो जाएगा।"))return;
+  await api("/api/rollback",{method:"POST",body:JSON.stringify({backup:b})}); toast("Restored ✓ — site देखें"); };
+
+/* ---------- PUBLISH / PREVIEW ---------- */
+async function doPublish(){
+  if(!confirm("Publish करें? Website files update होंगी (auto-backup सहित)।")) return;
+  toast("Publishing…");
+  try{ const r=await api("/api/publish",{method:"POST"});
+    toast(`Published ✓ ${r.changed.length} files`);
+    if(r.warnings.length) openModal(`<h2>⚠ Warnings</h2><ul>${r.warnings.map(w=>`<li>${w}</li>`).join("")}</ul><button class="btn btn-g" onclick="closeModal()">OK</button>`);
+    await reloadData();
+  }catch(e){ toast(e.message); }
+}
+const HASH_FILE={home:"index.html",about:"about.html",welfare:"journalist-welfare.html",membership:"membership.html",news:"news.html",activities:"activities.html",gallery:"gallery.html",contact:"contact.html"};
+function doPreview(){ const h=(location.hash||"#dashboard").slice(1); window.open("/api/preview?page="+(HASH_FILE[h]||"index.html"),"_blank"); }
+
+/* ---------- HELP ---------- */
+function vHelp(){
+  $("#view").innerHTML=`<div class="card help"><h2>❓ Guide (Hindi) — नया आसान system</h2><ol>
+  <li><b>Photo + नाम एक साथ:</b> 📁 Media → Upload → popup में कहां लगाना है चुनें (नेतृत्व/गैलरी/समाचार) + नाम भरें → <b>Save + Publish = तुरंत LIVE</b> 🎉</li>
+  <li><b>Har page alag:</b> left menu में 🏠 Home, 📰 News, 🖼 Gallery… हर page का text + add table एक ही जगह।</li>
+  <li><b>Auto-publish:</b> ऊपर <b>🚀 Auto: ON</b> है तो हर Save = LIVE। Band करना हो तो OFF करें, फिर Publish दबाएं।</li>
+  <li><b>Text बदलना:</b> page खोलें → text edit → Save (auto-live)।</li>
+  <li><b>Preview:</b> ऊपर 👁 — बिना publish देख लें।</li>
+  <li><b>गड़बड़ हो जाए:</b> 💾 Backup → Restore।</li>
+  <li><b>Login:</b> <code>/admin</code> — server terminal में <code>node admin/server.js</code> चलता रहे।</li>
+  </ol></div>`;
+}
+
+// boot
+(async function(){
+  try{ const m=await api("/api/me"); if(m.user){ ME={user:m.user,role:m.role}; enterApp(m.mustChange); } }catch(e){}
+})();
+</script>
+</body>
+</html>

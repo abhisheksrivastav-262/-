@@ -40,6 +40,12 @@
     const url = "https://wa.me/"+WHATSAPP_NUMBER+"?text="+encodeURIComponent(text);
     window.open(url,"_blank","noopener");
   }
+  // Admin inbox copy (silent — fails quietly on static hosting)
+  function saveInbox(type, data){
+    try{
+      fetch("/api/inbox",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({type:type,data:data})}).catch(()=>{});
+    }catch(e){}
+  }
 
   // Membership form (+ Donate option)
   const mform = $("#membershipForm");
@@ -73,6 +79,7 @@
         isDonate ? "कृपया भुगतान की पुष्टि करें।" : "कृपया सदस्यता प्रक्रिया की जानकारी दें।"
       ];
       $("#formStatus") && ($("#formStatus").textContent = "WhatsApp खुल रहा है… कृपया Send दबाकर आवेदन भेजें।");
+      saveInbox(isDonate?"donate":"membership",{purpose:purpose,name:v("name"),mobile:v("mobile"),email:v("email"),city:v("city"),district:v("district"),state:v("state"),org:v("org"),role:v("role"),exp:v("exp"),message:v("message"),amount:v("amount"),utr:v("utr")});
       openWhatsApp(lines.join("\n"));
     });
     // Donate box toggle + #donate preselect + submit text swap
@@ -110,6 +117,7 @@
         "संदेश: "+(v("message")||"-")
       ];
       $("#cStatus") && ($("#cStatus").textContent="WhatsApp खुल रहा है… कृपया Send दबाकर संदेश भेजें।");
+      saveInbox("contact",{name:v("name"),mobile:v("mobile"),email:v("email"),subject:v("subject"),message:v("message")});
       openWhatsApp(lines.join("\n"));
     });
   }

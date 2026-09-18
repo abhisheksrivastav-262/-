@@ -317,6 +317,8 @@ a,button{-webkit-tap-highlight-color:transparent}
 @media(max-width:560px){.grid-leaders{grid-template-columns:1fr}.leader-card img{aspect-ratio:3/3}}
 /* landscape photo — बिना कटे पूरी दिखे */
 .leader-card--full img{aspect-ratio:4/3;object-fit:contain;background:#0a1a3c}
+/* Activity optional photo */
+.t-item .t-thumb{grid-column:1/-1;width:100%;height:220px;object-fit:cover;border-radius:12px}
 /* Event highlight photo — chhota size, bina kate, mobile-friendly */
 .split img.frame.event-photo{max-width:340px;width:100%;height:auto;margin:0 auto;aspect-ratio:auto;object-fit:contain;display:block}
 .g-item--tall img{height:320px;object-fit:contain;background:#0a1a3c}

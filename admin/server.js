@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
 
-const PORT = 8010;
+const PORT = process.env.PORT || 8010;
 const ROOT = path.resolve(__dirname, "..");
 const ADMIN_DIR = __dirname;
 const DB_FILE = path.join(ADMIN_DIR, "data.json");
@@ -25,6 +25,9 @@ function loadEnv(){
   return env;
 }
 const ENV=loadEnv();
+for(const k of ["SUPABASE_URL","SUPABASE_PUBLISHABLE_KEY","SUPABASE_SECRET_KEY"]){
+  if(process.env[k]) ENV[k]=process.env[k]; // production host env overrides local .env file
+}
 const SB_URL=ENV.SUPABASE_URL||"";
 const SB_ANON=ENV.SUPABASE_PUBLISHABLE_KEY||"";
 const SB_SECRET=ENV.SUPABASE_SECRET_KEY||"";
@@ -883,6 +886,11 @@ loadDB();
 http.createServer(async (req,res)=>{
   try{
     const url=req.url.split("?")[0];
+    if(url==="/health"&&req.method==="GET"){
+      const hbody='{"ok":true}';
+      res.writeHead(200,{"Content-Type":"application/json","Content-Length":Buffer.byteLength(hbody),"Cache-Control":"no-store"});
+      res.end(hbody); return;
+    }
     if(url==="/admin"||url==="/admin/"){ res.writeHead(200,{"Content-Type":"text/html; charset=utf-8","Cache-Control":"no-store"}); res.end(fs.readFileSync(path.join(ADMIN_DIR,"panel.html"))); return; }
     if(url.startsWith("/api/")){ await api(req,res,url); return; }
     if(req.method!=="GET"){ send(res,405,"Method not allowed","text/plain"); return; }

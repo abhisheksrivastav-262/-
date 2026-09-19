@@ -279,6 +279,7 @@ a,button{-webkit-tap-highlight-color:transparent}
 .ad-slide h3{color:#fff;font-size:clamp(1.4rem,3vw,2.1rem);margin:10px 0 8px}
 .ad-slide p{color:#e3e9ff;max-width:560px;margin:0 0 18px}
 .ad-tag{display:inline-block;font-size:.72rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.4);padding:5px 12px;border-radius:99px;color:#fff}
+.ad-photo{width:120px;height:120px;object-fit:cover;border-radius:14px;border:2px solid rgba(255,255,255,.5);margin:12px 0 4px;display:block}
 .ad-nav{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(0,0,0,.3);color:#fff;font-size:1.4rem;cursor:pointer;line-height:1}
 .ad-nav.prev{left:14px}.ad-nav.next{right:14px}
 .ad-dots{position:absolute;bottom:14px;left:0;right:0;display:flex;gap:8px;justify-content:center}
@@ -317,6 +318,17 @@ a,button{-webkit-tap-highlight-color:transparent}
 @media(max-width:560px){.grid-leaders{grid-template-columns:1fr}.leader-card img{aspect-ratio:3/3}}
 /* landscape photo — बिना कटे पूरी दिखे */
 .leader-card--full img{aspect-ratio:4/3;object-fit:contain;background:#0a1a3c}
+/* Footer social icons (only when URLs set) */
+.social-row{display:flex;gap:10px;margin-top:14px}
+.social-row a{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.25);color:#fff;text-decoration:none;font-weight:800;font-size:.9rem}
+.social-row a:hover{background:var(--royal)}
+/* Donor wall + ID card print */
+@media print{ body.print-card .topbar,body.print-card .site-header,body.print-card .mobile-menu,body.print-card footer,body.print-card .fab,body.print-card .no-print{display:none!important} }
+.idcard{width:340px;border:2px solid var(--navy);border-radius:16px;overflow:hidden;background:#fff;color:var(--ink)}
+.idcard .id-head{background:linear-gradient(135deg,var(--navy),var(--royal));color:#fff;padding:14px;display:flex;gap:10px;align-items:center}
+.idcard .id-head img{width:52px;height:52px;border-radius:50%;background:#fff;object-fit:cover}
+.idcard .id-body{padding:16px;display:grid;gap:6px;font-size:.9rem}
+.idcard .id-photo{width:90px;height:110px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
 /* Activity optional photo */
 .t-item .t-thumb{grid-column:1/-1;width:100%;height:220px;object-fit:cover;border-radius:12px}
 /* Event highlight photo — chhota size, bina kate, mobile-friendly */

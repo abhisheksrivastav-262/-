@@ -1,3 +1,7 @@
 # Admin panel runtime (passwords + sessions + backups — never commit)
 admin/data.json
 admin/backups/
+# Supabase / secrets — never commit (publishable key stays local, secret key stays server-side only)
+admin/.env
+.env
+.env.example

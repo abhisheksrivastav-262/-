@@ -3,67 +3,135 @@
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Panel | जर्नलिस्ट सेवा परिषद</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--navy:#0a1a3c;--royal:#1740a8;--gold:#c9a227;--bg:#f2f4f9;--card:#fff;--line:#e2e7f2;--ink:#1a1e26;--mut:#5b6474;--ok:#1faa55;--bad:#d33}
-*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans Devanagari",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+:root{--navy:#0a1a3c;--navy2:#0d2350;--royal:#1740a8;--gold:#c9a227;--gold2:#e8cf7a;--bg:#eef1f7;--card:#fff;--line:#e2e7f2;--ink:#1a1e26;--mut:#5b6474;--ok:#1faa55;--bad:#d33;--sh:0 10px 30px -12px rgba(10,26,60,.25)}
+*{box-sizing:border-box}body{margin:0;font-family:"Noto Sans Devanagari",system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
 a{color:var(--royal)}
-#loginView{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:linear-gradient(135deg,var(--navy),var(--royal))}
-.login-card{background:#fff;border-radius:18px;padding:36px;width:min(420px,100%);box-shadow:0 30px 80px rgba(0,0,0,.4)}
-.login-card h1{color:var(--navy);margin:0 0 4px;font-size:1.4rem}.login-card p{color:var(--mut);margin:0 0 20px}
+#loginView{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;background:radial-gradient(800px 400px at 20% 0%,#2456d633,transparent),linear-gradient(135deg,#070f26,#0d2350 60%,#1740a8)}
+.login-card{background:#fff;border-radius:22px;width:min(760px,100%);display:grid;grid-template-columns:1fr 1.1fr;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.5);animation:pop .4s ease}
+.login-side{background:linear-gradient(160deg,var(--navy),var(--royal));color:#fff;padding:44px 34px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px}
+.login-side img{width:110px;height:110px;border-radius:50%;object-fit:cover;background:#fff;border:3px solid var(--gold)}
+.login-side h2{margin:6px 0 0;font-size:1.35rem}.login-side p{margin:0;color:#cdd8f7;font-size:.9rem}
+.login-form{padding:40px 36px}
+.login-form h1{color:var(--navy);margin:0 0 4px;font-size:1.4rem}.login-form p{color:var(--mut);margin:0 0 20px}
 #app{display:none}
-.topbar{position:sticky;top:0;z-index:20;background:var(--navy);color:#fff;display:flex;align-items:center;gap:10px;padding:10px 16px}
+.topbar{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);color:var(--navy);display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);box-shadow:0 4px 18px -8px rgba(10,26,60,.25)}
 .topbar b{font-size:1rem}.topbar .sp{flex:1}
-.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:700;font-family:inherit;cursor:pointer;font-size:.92rem}
-.btn-p{background:var(--gold);color:#1a1a1a}.btn-b{background:var(--royal);color:#fff}.btn-g{background:#eef1f7;color:var(--navy)}.btn-r{background:var(--bad);color:#fff}.btn-s{background:var(--ok);color:#fff}
+.hamburger{display:none;border:0;background:var(--navy);color:#fff;width:42px;height:42px;border-radius:12px;font-size:1.2rem;cursor:pointer}
+.btn{border:0;border-radius:10px;padding:10px 16px;font-weight:700;font-family:inherit;cursor:pointer;font-size:.92rem;transition:.18s}
+.btn:hover{transform:translateY(-1px)}.btn:active{transform:none}
+.btn-p{background:linear-gradient(135deg,#d9b42f,#a88114);color:#fff;box-shadow:0 8px 20px -8px rgba(168,129,20,.7)}
+.btn-b{background:linear-gradient(135deg,var(--royal),var(--navy2));color:#fff;box-shadow:0 8px 20px -8px rgba(23,64,168,.6)}
+.btn-g{background:#eef1f7;color:var(--navy)}.btn-r{background:var(--bad);color:#fff}.btn-s{background:linear-gradient(135deg,#23b45e,#148041);color:#fff;box-shadow:0 8px 20px -8px rgba(31,170,85,.6)}
 .btn-sm{padding:7px 12px;font-size:.84rem}
-.shell{display:grid;grid-template-columns:230px 1fr;min-height:calc(100vh - 53px)}
-.side{background:#fff;border-right:1px solid var(--line);padding:14px;display:flex;flex-direction:column;gap:4px}
-.side a{display:block;text-decoration:none;color:var(--ink);font-weight:700;padding:11px 13px;border-radius:10px;font-size:.94rem}
-.side a.on,.side a:hover{background:#eaf0ff;color:var(--royal)}
-.side .grp{font-size:.72rem;font-weight:800;letter-spacing:.08em;color:var(--mut);padding:12px 13px 4px}
-.main{padding:22px;max-width:1100px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:18px}
-.card h2{margin:0 0 6px;color:var(--navy);font-size:1.25rem}.card h3{color:var(--navy);margin:22px 0 10px}
+.shell{display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 59px)}
+.side{background:linear-gradient(180deg,#070f26,#0d2350);padding:16px 12px;display:flex;flex-direction:column;gap:4px;position:sticky;top:59px;height:calc(100vh - 59px);overflow-y:auto}
+.side::-webkit-scrollbar{width:6px}.side::-webkit-scrollbar-thumb{background:#ffffff33;border-radius:99px}
+.side-brand{display:flex;align-items:center;gap:10px;padding:6px 8px 14px;color:#fff}
+.side-brand img{width:44px;height:44px;border-radius:50%;object-fit:cover;background:#fff;border:2px solid var(--gold)}
+.side-brand b{font-size:.95rem;line-height:1.25}.side-brand small{display:block;color:#9fb1e3;font-weight:400;font-size:.72rem}
+.side a{display:block;text-decoration:none;color:#c9d4f2;font-weight:700;padding:11px 13px;border-radius:10px;font-size:.94rem;transition:.15s;border:1px solid transparent}
+.side a:hover{background:#ffffff14;color:#fff}
+.side a.on{background:linear-gradient(135deg,var(--royal),#2a5bff);color:#fff;border-color:#ffffff33;box-shadow:0 8px 18px -8px rgba(36,86,214,.8)}
+.side .grp{font-size:.7rem;font-weight:800;letter-spacing:.1em;color:var(--gold2);padding:14px 13px 4px}
+.overlay{display:none}
+.main{padding:24px;max-width:1100px;animation:fadeUp .35s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}
+.main{padding:24px;max-width:1100px;animation:fadeUp .35s ease}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:24px;margin-bottom:18px;box-shadow:var(--sh)}
+.card h2{margin:0 0 6px;color:var(--navy);font-size:1.25rem;display:flex;align-items:center;gap:8px}
+.card h2::before{content:"";width:5px;height:22px;background:linear-gradient(var(--gold),#a88114);border-radius:99px;flex:0 0 5px}
+.card h3{color:var(--navy);margin:24px 0 10px}
 .mut{color:var(--mut);font-size:.9rem}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
-.stat{background:linear-gradient(135deg,var(--navy),var(--royal));color:#fff;border-radius:14px;padding:18px}
-.stat b{font-size:1.8rem;display:block}.stat span{font-size:.85rem;opacity:.85}
+.stat{background:linear-gradient(135deg,var(--navy),var(--royal) 70%);color:#fff;border-radius:16px;padding:20px 18px;position:relative;overflow:hidden;box-shadow:var(--sh);transition:.2s}
+.stat:hover{transform:translateY(-3px)}
+.stat::after{content:"";position:absolute;right:-40px;top:-40px;width:130px;height:130px;border:1px solid rgba(201,162,39,.5);border-radius:50%;pointer-events:none}
+.stat b{font-size:1.9rem;display:block;color:var(--gold2)}.stat span{font-size:.85rem;opacity:.85}
 label.f{display:block;font-weight:700;margin:14px 0 6px;color:var(--navy);font-size:.92rem}
-input[type=text],input[type=password],input[type=number],select,textarea{width:100%;font:inherit;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fbfcff}
+input[type=text],input[type=password],input[type=number],select,textarea{width:100%;font:inherit;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fbfcff;transition:.15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--royal);box-shadow:0 0 0 3px #1740a822;background:#fff}
 textarea{min-height:90px;resize:vertical}
 table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-th{color:var(--navy)}tr:hover td{background:#f7f9ff}
+th{color:var(--navy);background:#f4f6fc}tr:hover td{background:#f7f9ff}
 img.th{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
 .badge{display:inline-block;font-size:.72rem;font-weight:800;padding:3px 10px;border-radius:99px;background:#eaf0ff;color:var(--royal)}
-.badge.off{background:#f1e3e3;color:var(--bad)}.badge.new{background:#dff5e7;color:var(--ok)}
+.badge.off{background:#fbe7e7;color:var(--bad)}.badge.new{background:#dff5e7;color:var(--ok)}
+#roleBadge{background:linear-gradient(135deg,#d9b42f,#a88114);color:#fff}
 .rowbtns{display:flex;gap:6px;flex-wrap:wrap}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:13px 24px;border-radius:99px;font-weight:700;display:none;z-index:99;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:92%}
-.modal{position:fixed;inset:0;background:rgba(4,8,20,.7);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
-.modal.open{display:flex}.modal .box{background:#fff;border-radius:16px;padding:26px;width:min(640px,100%);max-height:90vh;overflow:auto}
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#070f26;color:#fff;padding:13px 26px;border-radius:99px;font-weight:700;display:none;z-index:99;box-shadow:0 14px 40px rgba(0,0,0,.4);max-width:92%;border:1px solid rgba(201,162,39,.5)}
+.modal{position:fixed;inset:0;background:rgba(4,8,20,.72);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+.modal.open{display:flex}.modal .box{background:#fff;border-radius:20px;padding:28px;width:min(640px,100%);max-height:90vh;overflow:auto;box-shadow:0 40px 100px rgba(0,0,0,.5);animation:pop .25s ease}
 .media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.media-grid figure{margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff}
+.media-grid figure{margin:0;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff;transition:.2s}
+.media-grid figure:hover{transform:translateY(-3px);box-shadow:var(--sh)}
 .media-grid img,.media-grid video{width:100%;height:120px;object-fit:cover;display:block;background:#000}
 .media-grid figcaption{font-size:.72rem;padding:8px;word-break:break-all}
 .help ol li{margin-bottom:10px}
-@media(max-width:760px){.shell{grid-template-columns:1fr}.side{flex-direction:row;overflow-x:auto;border-right:0;border-bottom:1px solid var(--line)}.side a{white-space:nowrap}.side .grp{display:none}.main{padding:14px}.topbar{flex-wrap:wrap}}
+.idcard{width:340px;max-width:100%;border:2px solid var(--navy);border-radius:16px;overflow:hidden;background:#fff;color:var(--ink)}
+.idcard .id-head{background:linear-gradient(135deg,var(--navy),var(--royal));color:#fff;padding:14px;display:flex;gap:10px;align-items:center}
+.idcard .id-head img{width:52px;height:52px;border-radius:50%;background:#fff;object-fit:cover}
+.idcard .id-body{padding:16px;display:grid;gap:6px;font-size:.9rem}
+.idcard .id-photo{width:90px;height:110px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+@media(max-width:860px){
+  .shell{grid-template-columns:1fr}
+  .hamburger{display:block}
+  .side{position:fixed;top:0;bottom:0;left:0;width:270px;z-index:60;height:100vh;border-radius:0 20px 20px 0;transform:translateX(-105%);transition:transform .3s ease;box-shadow:30px 0 60px rgba(0,0,0,.4)}
+  body.nav-open .side{transform:none}
+  .overlay{display:block;position:fixed;inset:0;background:rgba(4,8,20,.6);z-index:55;opacity:0;pointer-events:none;transition:.25s}
+  body.nav-open .overlay{opacity:1;pointer-events:auto}
+  .main{padding:14px}
+  .topbar{flex-wrap:wrap}
+  .login-card{grid-template-columns:1fr}
+  .login-side{padding:30px 20px}
+  .login-form{padding:28px 22px}
+}
+
+/* ---------- Newsroom editor ---------- */
+.ed-top{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.ed-top h2{margin:0;color:var(--navy);font-size:1.35rem}
+.ed-grid{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start}
+.ed-title{font-size:1.2rem;font-weight:800;padding:14px}
+.upbox{border:2px dashed #b9c4e2;border-radius:14px;background:#f6f8ff;overflow:hidden}
+.upbox img{width:100%;max-height:320px;object-fit:cover;display:block;background:#0a1a3c}
+.upbox .up-empty{padding:44px 20px;text-align:center;color:var(--mut)}
+.up-btns{display:flex;gap:8px;padding:12px;flex-wrap:wrap;background:#fff;border-top:1px solid var(--line);align-items:center}
+.publish-box{position:sticky;top:80px}
+.pub-row{display:flex;gap:8px;margin-top:10px}
+.pub-row .btn{flex:1}
+.switch{display:flex;align-items:center;justify-content:space-between;background:#f4f6fc;border-radius:10px;padding:10px 12px;font-weight:700}
+.switch select{width:auto}
+.count{font-size:.78rem;color:var(--mut);text-align:right}
+.list-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;align-items:center}
+.list-tools input[type=text]{flex:1;min-width:160px}
+.lrow{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-bottom:10px}
+.lrow img.th{width:72px;height:72px;flex:0 0 72px}
+.lrow .grow{flex:1;min-width:0}.lrow .grow b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:900px){.ed-grid{grid-template-columns:1fr}.publish-box{position:static}}
 </style>
 </head>
 <body>
 
 <div id="loginView">
   <div class="login-card">
+    <div class="login-side"><img src="assets/logo.jpeg" alt="JSP Logo"><h2>जर्नलिस्ट सेवा परिषद</h2><p>Website Control Panel</p></div>
+    <div class="login-form">
     <h1>🔐 Admin Login</h1>
-    <p>जर्नलिस्ट सेवा परिषद — Website Control Panel</p>
+    <p>अपना username और password डालें</p>
     <label class="f">Username</label><input type="text" id="liUser" value="admin" autocomplete="username">
     <label class="f">Password</label><input type="password" id="liPass" value="admin123" autocomplete="current-password">
     <div style="margin-top:18px;display:flex;gap:10px"><button class="btn btn-b" style="flex:1" onclick="doLogin()">Login →</button></div>
     <p class="mut" style="margin:14px 0 0">Default: <b>admin / admin123</b> — पहले login पर password बदलना जरूरी है।</p>
     <p id="liErr" style="color:var(--bad);font-weight:700"></p>
+    </div>
   </div>
 </div>
 
 <div id="app">
   <div class="topbar">
+    <button class="hamburger" onclick="document.body.classList.toggle('nav-open')" aria-label="Menu">☰</button>
     <b>📰 JSP Admin</b><span class="badge" id="roleBadge">-</span><span class="sp"></span>
     <button class="btn btn-sm" id="apBtn" style="background:#ffffff33;color:#fff" onclick="toggleAP()">🚀 Auto: ON</button>
     <button class="btn btn-g btn-sm" onclick="window.open('/','_blank')">🌐 Site</button>
@@ -72,7 +140,8 @@ img.th{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px sol
     <button class="btn btn-sm" style="background:#ffffff33;color:#fff" onclick="doLogout()">Logout</button>
   </div>
   <div class="shell">
-    <nav class="side" id="sideNav"></nav>
+    <div class="overlay" onclick="document.body.classList.remove('nav-open')"></div>
+    <nav class="side" id="sideNav" onclick="if(event.target.tagName==='A')document.body.classList.remove('nav-open')"></nav>
     <div class="main" id="view"></div>
   </div>
 </div>
@@ -131,23 +200,40 @@ $("#modal").addEventListener("click",e=>{ if(e.target.id==="modal") closeModal()
 const NAV=[
  ["home","🏠 होम"],["about","ℹ️ हमारे बारे में"],["welfare","⚖️ पत्रकार हित"],["membership","📝 सदस्यता"],
  ["activities","📅 गतिविधियां"],["news","📰 समाचार"],["gallery","🖼 मीडिया गैलरी"],["contact","📞 संपर्क"],
+ ["grpM","👥 प्रबंधन"],
+ ["members","🧑‍💼 सदस्य"],["notices","📣 घोषणाएं"],["donors","❤️ दानदाता"],["objectives","🎯 उद्देश्य"],["consumerpg","📄 जागरूकता पेज"],["idcard","🪪 ID कार्ड"],
  ["grp2","⚙️ SYSTEM"],
- ["ads","📢 Ads"],["donate","❤️ Donate"],["media","📁 Media"],["inbox","📥 Inbox"],["users","👥 Users"],["backups","💾 Backup"],["help","❓ Help"]
+ ["ads","📢 Ads"],["donate","❤️ दान + बैंक"],["media","📁 Media"],["social","🔗 Social"],["inbox","📥 Inbox"],["users","👥 Users"],["backups","💾 Backup"],["help","❓ Help"]
 ];
-const VIEWS={home:vHome,about:vAbout,welfare:vWelfare,membership:vMembership,news:vNewsPage,activities:vActivitiesPage,gallery:vGalleryPage,contact:vContact,ads:vAds,donate:vDonate,media:vMedia,inbox:vInbox,users:vUsers,backups:vBackups,help:vHelp};
+const VIEWS={home:vHome,about:vAbout,welfare:vWelfare,membership:vMembership,news:vNewsPage,activities:vActivitiesPage,gallery:vGalleryPage,contact:vContact,members:vMembers,notices:vNotices,donors:vDonors,objectives:vObjectives,consumerpg:vConsumerPg,idcard:vIdCard,ads:vAds,donate:vDonate,media:vMedia,social:vSocial,inbox:vInbox,users:vUsers,backups:vBackups,help:vHelp};
 function nav(){
   const v=(location.hash||"#home").slice(1);
-  $("#sideNav").innerHTML=NAV.map(n=>n[0].startsWith("grp")?`<div class="grp">${n[1]}</div>`:`<a href="#${n[0]}" class="${v===n[0]?'on':''}">${n[1]}</a>`).join("");
+  $("#sideNav").innerHTML=`<div class="side-brand"><img src="assets/logo.jpeg" alt="JSP"><b>जर्नलिस्ट सेवा परिषद<small>Admin Panel</small></b></div>`+NAV.map(n=>n[0].startsWith("grp")?`<div class="grp">${n[1]}</div>`:`<a href="#${n[0]}" class="${v===n[0]?'on':''}">${n[1]}</a>`).join("");
+  const parts=v.split("/");
+  if(parts[0]==="edit"){ vEditor(parts[1],parts[2]); return; }
   (VIEWS[v]||vHome)();
 }
-function fld(id,val,type,label){
-  const v=(val!==undefined&&val!=="")?val:"";
-  return `<label class="f">${label}</label>`+(type==="textarea"?`<textarea data-f="${id}">${v.replace(/</g,"&lt;")}</textarea>`:`<input type="text" data-f="${id}" value="${v.replace(/"/g,"&quot;")}">`);
+function bareInner(v,bare){
+  if(!bare) return String(v??"");
+  let s=String(v||"").replace(new RegExp("^<"+bare.tag+"[^>]*>"),"").replace(new RegExp("</"+bare.tag+">\\s*$"),"");
+  if(bare.em) s=s.replace(/<em>(.*?)<\/em>/g,"[$1]");
+  return s;
+}
+function bareWrap(v,bare){
+  if(!bare) return v;
+  let s=String(v||"");
+  if(bare.em) s=s.replace(/\[(.*?)\]/g,"<em>$1</em>");
+  return `<${bare.tag}${bare.attrs}>${s}</${bare.tag}>`;
+}
+function fld(id,val,type,label,bare){
+  const raw=(val!==undefined&&val!=="")?val:"";
+  const v=bareInner(raw,bare);
+  return `<label class="f">${label}</label>`+((type==="textarea"||bare)?`<textarea data-f="${id}">${v.replace(/</g,"&lt;")}</textarea>`:`<input type="text" data-f="${id}" value="${v.replace(/"/g,"&quot;")}">`);
 }
 function fld2(k,v,label){ return `<label class="f">${label}</label><input type="text" data-k="${k}" value="${(v??"").replace(/"/g,"&quot;")}">`; }
 function gFld(key,val,label){ return `<label class="f">${label}</label><input type="text" data-g="${key}" value="${(val??"").replace(/"/g,"&quot;")}">`; }
 async function saveFields(){
-  for(const el of document.querySelectorAll("[data-f]")){ await api("/api/save",{method:"POST",body:JSON.stringify({kind:"field",id:el.dataset.f,value:el.value})}); }
+  for(const el of document.querySelectorAll("[data-f]")){ const def=(DATA.fieldDefs.find(f=>f.id===el.dataset.f)||{}); await api("/api/save",{method:"POST",body:JSON.stringify({kind:"field",id:el.dataset.f,value:bareWrap(el.value,def.bare)})}); }
   for(const el of document.querySelectorAll("[data-g]")){ await api("/api/save",{method:"POST",body:JSON.stringify({kind:"globals",id:el.dataset.g,value:el.value})}); }
   for(const el of document.querySelectorAll("[data-seo]")){ const [f,k]=el.dataset.seo.split("|"); DATA.seo[f]=DATA.seo[f]||{}; DATA.seo[f][k]=el.value; }
   for(const f in (DATA.seo||{})) await api("/api/save",{method:"POST",body:JSON.stringify({kind:"seo",id:f,value:DATA.seo[f]})});
@@ -158,7 +244,7 @@ function pageFieldsHTML(page){
   const defs=DATA.fieldDefs.filter(f=>f.page===page);
   const secs={}; defs.forEach(f=>{ (secs[f.section]=secs[f.section]||[]).push(f); });
   let h="";
-  Object.keys(secs).forEach(s=>{ h+=`<h3>${s}</h3>`; secs[s].forEach(f=>{ h+=fld(f.id,f.current,f.type,f.label+` <span class="mut">(${f.file})</span>`); }); });
+    Object.keys(secs).forEach(s=>{ h+=`<h3>${s}</h3>`; secs[s].forEach(f=>{ h+=fld(f.id,f.current,f.type,f.label+` <span class="mut">(${f.file})</span>`,f.bare); }); });
   const sf=PAGE_FILE[page];
   if(sf&&DATA.seo[sf]){ h+=`<h3>🔍 SEO (${sf})</h3><label class="f">Meta title</label><input type="text" data-seo="${sf}|title" value="${(DATA.seo[sf].title||"").replace(/"/g,"&quot;")}"><label class="f">Meta description</label><textarea data-seo="${sf}|desc">${(DATA.seo[sf].desc||"").replace(/</g,"&lt;")}</textarea>`; }
   h+=`<div style="margin-top:16px"><button class="btn btn-s" onclick="saveFields()">💾 Save${AUTOPUB?" (auto-live 🚀)":""}</button></div>`;
@@ -178,14 +264,14 @@ function vDashboard(){
     <div class="stat"><b>${L.ads.length}</b><span>विज्ञापन</span></div>
   </div>
   <div class="card" style="margin-top:18px"><h2>⚡ Quick Add (har page ke liye)</h2>
-    <div class="rowbtns"><a class="btn btn-b btn-sm" href="#news">+ समाचार</a><a class="btn btn-b btn-sm" href="#gallery">+ फोटो</a><a class="btn btn-b btn-sm" href="#home">+ नेता</a><a class="btn btn-b btn-sm" href="#activities">+ गतिविधि</a><a class="btn btn-b btn-sm" href="#media">Media upload</a><a class="btn btn-b btn-sm" href="#inbox">Inbox</a></div>
+    <div class="rowbtns"><a class="btn btn-b btn-sm" href="#edit/news/new">+ समाचार</a><a class="btn btn-b btn-sm" href="#edit/gallery/new">+ फोटो</a><a class="btn btn-b btn-sm" href="#edit/leaders/new">+ नेता</a><a class="btn btn-b btn-sm" href="#edit/activities/new">+ गतिविधि</a><a class="btn btn-b btn-sm" href="#media">Media upload</a><a class="btn btn-b btn-sm" href="#inbox">Inbox</a></div>
     <h3>Global Settings</h3>
     ${gFld("phone",DATA.globals.phone,"📞 Phone / Call number")}
     ${gFld("email",DATA.globals.email,"✉️ Email ID")}
     ${gFld("wa",DATA.globals.wa,"💬 WhatsApp number (country code सहित)")}
     ${gFld("addrKanpur",DATA.globals.addrKanpur,"📍 Kanpur address")}
     ${gFld("addrMumbai",DATA.globals.addrMumbai,"🏢 Mumbai National Office")}
-    ${fld("foot_about",(DATA.fieldDefs.find(f=>f.id==="foot_about")||{}).current,"input","Footer about text (all pages)")}
+    ${fld("foot_about",(DATA.fieldDefs.find(f=>f.id==="foot_about")||{}).current,"input","Footer about text (all pages)",(DATA.fieldDefs.find(f=>f.id==="foot_about")||{}).bare)}
     <div style="margin-top:14px"><button class="btn btn-s" onclick="saveFields()">💾 Save</button></div>
   </div>`;
 }
@@ -208,40 +294,176 @@ ${fld("foot_about",(DATA.fieldDefs.find(f=>f.id==="foot_about")||{}).current,"in
 <div style="margin-top:14px"><button class="btn btn-s" onclick="saveFields()">💾 Save</button></div></div>`; }
 
 /* ---------- list tables (shared) ---------- */
+const imgCell=it=>it.img?`<img class="th" src="/${it.img}">`:"-";
+const actBadge=it=>it.active===false?'<span class="badge off">hidden</span>':'<span class="badge">live</span>';
 const FORMS={leaders:formLeader,news:formNews,activities:formAct,gallery:formGal,ads:formAd};
 const LEAD_COLS=[["cap","Photo / नाम"],["full","Full-frame?",it=>it.full?"yes":"no"],["","Status",actBadge]];
 const NEWS_COLS=[["img","Img",imgCell],["title","Title"],["cat","Category"],["tag","Tag"],["","Status",actBadge]];
 const ACT_COLS=[["title","Title"],["cat","Category"],["date","Date"],["","Status",actBadge]];
 const GAL_COLS=[["img","Img",imgCell],["cap","Caption"],["cat","Category"],["","Status",actBadge]];
 const AD_COLS=[["title","Title"],["label","Badge"],["theme","Theme"],["href","Link"]];
-function formLeader(it){ return `${fld2("img",it.img,"Image path (नीचे Upload से auto-भरेगा)")}${fld2("naam",it.naam,"नाम * (जैसे — आलोक दुवेदी)")}${fld2("pad",it.pad,"पद * (जैसे — प्रभारी उत्तर प्रदेश जर्नलिस्ट सेवा परिषद)")}${fld2("alt",it.alt,"Alt text")}${fld2("cap",it.cap,"Caption (खाली छोड़ें = पद + नाम से auto-बनेगा)")}<label class="f">Full-frame photo (बिना कटे)? <input type="checkbox" data-k="full" ${it.full?"checked":""}></label><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
-function formNews(it){ return `${fld2("img",it.img,"Image path (नीचे Upload से auto-भरेगा)")}${fld2("cat",it.cat,"Category value (english, जैसे event)")}${fld2("tag",it.tag,"Tag label (Hindi)")}${fld2("title",it.title,"Title")}${fld2("share",it.share,"Share button title (short)")}${fld2("date",it.date,"Date line")}${fld2("alt",it.alt,"Alt")}<label class="f">Description</label><textarea data-k="desc">${it.desc||""}</textarea><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
-function formAct(it){ return `${fld2("img",it.img||"","Photo (optional — नीचे Upload से auto-भरेगा)")}${fld2("cat",it.cat,"Category value")}${fld2("tag",it.tag,"Tag label")}${fld2("title",it.title,"Title")}${fld2("date",it.date,"Date (जैसे तिथि TB*)")}${fld2("place",it.place,"Place")}${fld2("meta",it.meta,"Meta line")}<label class="f">Description</label><textarea data-k="desc">${it.desc||""}</textarea><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
-function formGal(it){ return `${fld2("img",it.img,"Image path (नीचे Upload से auto-भरेगा)")}${fld2("cat",it.cat,"Category value")}${fld2("alt",it.alt,"Alt")}${fld2("cap",it.cap,"Caption")}<label class="f">Tall frame? <input type="checkbox" data-k="tall" ${it.tall?"checked":""}></label><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
-function formAd(it){ return `${fld2("label",it.label,"Badge (विज्ञापन / Demo)")}${fld2("title",it.title,"Title")}<label class="f">Text</label><textarea data-k="text">${it.text||""}</textarea>${fld2("cta",it.cta,"Button text")}${fld2("href",it.href,"Button link")}${fld2("theme",it.theme,"Theme (house/t1/t2)")}`; }
+function catSelect(cur,catsKey){
+  const cats=(DATA.lists[catsKey]||[]);
+  return `<label class="f">Category *</label><select data-k="cat">${cats.map(c=>`<option value="${c.value}" ${c.value===cur?"selected":""}>${c.label}</option>`).join("")}</select><input type="text" data-k="catnew" placeholder="या नई category लिखें (english में)" style="margin-top:6px">`;
+}
+function formLeader(it){ return `${fld2("img",it.img||"","📷 Photo (नीचे box से Upload करें)")}${fld2("naam",it.naam||"","नाम * (जैसे — आलोक दुवेदी)")}${fld2("pad",it.pad||"","पद * (जैसे — प्रभारी उत्तर प्रदेश जर्नलिस्ट सेवा परिषद)")}<label class="f">Full-frame photo (बिना कटे)? <input type="checkbox" data-k="full" ${it.full?"checked":""}></label><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function formNews(it){ return `${fld2("img",it.img||"","📷 Photo (नीचे box से Upload करें)")}${catSelect(it.cat||"event","newsCats")}${fld2("title",it.title||"","Title *")}${fld2("tag",it.tag||"संगठन समाचार","Tag (Hindi)")}${fld2("date",it.date||"नया अपडेट","Date line")}<label class="f">Description</label><textarea data-k="desc" placeholder="खबर का विवरण…">${it.desc||""}</textarea><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function formAct(it){ return `${fld2("img",it.img||"","📷 Photo — optional (नीचे box से Upload करें)")}${fld2("title",it.title||"","Title *")}${catSelect(it.cat||"event","actCats")}${fld2("tag",it.tag||"कार्यक्रम","Tag (Hindi)")}${fld2("date",it.date||"","Date")}${fld2("place",it.place||"","Place")}<label class="f">Description</label><textarea data-k="desc" placeholder="विवरण…">${it.desc||""}</textarea><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function formGal(it){ return `${fld2("img",it.img||"","📷 Photo (नीचे box से Upload करें)")}${fld2("cap",it.cap||"","Caption * (फोटो के नीचे दिखेगा)")}${catSelect(it.cat||"event","galCats")}<label class="f">Tall frame? <input type="checkbox" data-k="tall" ${it.tall?"checked":""}></label><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function formAd(it){ return `${fld2("img",it.img||"","Ad image (optional — slide में दिखेगी)")}${fld2("label",it.label,"Badge (विज्ञापन / Demo)")}${fld2("title",it.title,"Title")}<label class="f">Text</label><textarea data-k="text">${it.text||""}</textarea>${fld2("cta",it.cta,"Button text")}${fld2("href",it.href,"Button link")}${fld2("theme",it.theme,"Theme (house/t1/t2)")}`; }
 function listTableHTML(title,key,cols){
   const items=DATA.lists[key];
+  const rows=items.map((it,i)=>{
+    const st=it.active===false?0:1;
+    const txt=((it.title||it.cap||"")+" "+(it.cat||"")+" "+(it.tag||"")).toLowerCase();
+    return `<div class="lrow" data-s="${txt.replace(/"/g,"&quot;")}" data-a="${st}"><div>${imgCell(it)}</div><div class="grow"><b>${it.title||it.cap||"(बिना शीर्षक)"}</b><span class="mut">${it.cat||""} ${it.date||""}</span> <span class="badge ${st?"":"off"}">${st?"live":"draft"}</span></div><div class="rowbtns"><a class="btn btn-b btn-sm" href="#edit/${key}/${i}">✏️ Edit</a><button class="btn btn-g btn-sm" onclick="moveItem('${key}',${i},-1)">▲</button><button class="btn btn-g btn-sm" onclick="moveItem('${key}',${i},1)">▼</button><button class="btn btn-r btn-sm" onclick="delItem('${key}',${i})">Del</button></div></div>`;
+  }).join("");
   return `<div class="card"><h2>${title}</h2><p class="mut">${AUTOPUB?"Save करते ही LIVE होगा 🚀":"Save के बाद Publish दबाएं"}। Order: ▲▼।</p>
-  <div style="margin:10px 0"><button class="btn btn-b btn-sm" onclick="editItem('${key}',-1)">+ नया जोड़ें</button></div>
-  <div style="overflow-x:auto"><table><tr><th>#</th>${cols.map(c=>`<th>${c[1]}</th>`).join("")}<th>Action</th></tr>
-  ${items.map((it,i)=>`<tr><td>${i+1}</td>${cols.map(c=>`<td>${c[2]?c[2](it):(it[c[0]]||"")}</td>`).join("")}
-  <td><div class="rowbtns"><button class="btn btn-g btn-sm" onclick="editItem('${key}',${i})">Edit</button><button class="btn btn-g btn-sm" onclick="moveItem('${key}',${i},-1)">▲</button><button class="btn btn-g btn-sm" onclick="moveItem('${key}',${i},1)">▼</button><button class="btn btn-r btn-sm" onclick="delItem('${key}',${i})">Del</button></div></td></tr>`).join("")}
-  </table></div></div>`;
+  <div class="list-tools"><input type="text" placeholder="🔍 खोजें…" oninput="filterList(this)"><select onchange="filterStatus(this)"><option value="">सभी</option><option value="1">Live</option><option value="0">Draft</option></select><a class="btn btn-b btn-sm" href="#edit/${key}/new">+ नया जोड़ें</a></div>
+  <div class="lrows">${rows||'<p class="mut">कुछ नहीं है — ऊपर से जोड़ें।</p>'}</div></div>`;
 }
+window.filterList=function(inp){ const q=inp.value.toLowerCase(); inp.closest(".card").querySelectorAll(".lrow").forEach(r=>{ r.style.display=r.dataset.s.includes(q)?"":"none"; }); };
+window.filterStatus=function(sel){ const v=sel.value; sel.closest(".card").querySelectorAll(".lrow").forEach(r=>{ r.style.display=(!v||r.dataset.a===v)?"":"none"; }); };
 window.editItem=function(key,i){
   const it=i<0?{}:DATA.lists[key][i];
-  const secName={leaders:"नेतृत्व",news:"समाचार",activities:"गतिविधि",gallery:"गैलरी फोटो",ads:"विज्ञापन"}[key]||key;
+  const secName={leaders:"नेतृत्व",news:"समाचार",activities:"गतिविधि",gallery:"गैलरी फोटो",ads:"विज्ञापन",members:"सदस्य",notices:"घोषणा",donors:"दानदाता",objectives:"उद्देश्य",consumer:"कार्यक्रम"}[key]||key;
   openModal(`<h2>${i<0?("+ "+secName+" जोड़ें"):"Edit — "+secName}</h2><p class="mut">भरो → Save = website पर LIVE 🚀</p>${FORMS[key](it)}
   <div style="margin-top:18px;display:grid;gap:10px"><button class="btn btn-s" style="padding:15px;font-size:1.05rem" onclick="saveItem('${key}',${i})">💾 Save — LIVE करें</button><button class="btn btn-g" onclick="closeModal()">Cancel</button></div>`);
   attachImgUploads();
 };
 window.saveItem=async function(key,i){
   const o=i<0?{active:true}:DATA.lists[key][i];
-  document.querySelectorAll("#modalBox [data-k]").forEach(el=>{ o[el.dataset.k]=el.type==="checkbox"?el.checked:el.value; });
-  if(key==="leaders"&&(((o.naam||"").trim()||(o.pad||"").trim()))){ o.cap=(((o.pad||"").trim()+" "+(o.naam||"").trim()).trim()); if(!o.alt) o.alt=o.cap; }
+  document.querySelectorAll("#modalBox [data-k]").forEach(el=>{ if(el.dataset.k==="catnew") return; o[el.dataset.k]=el.type==="checkbox"?el.checked:el.value; });
+  const CATMAP={news:"newsCats",activities:"actCats",gallery:"galCats"};
+  const cn=document.querySelector('#modalBox [data-k="catnew"]');
+  if(cn&&cn.value.trim()){ o.cat=cn.value.trim().toLowerCase().replace(/\s+/g,"-"); const ck=CATMAP[key];
+    if(ck&&!DATA.lists[ck].some(c=>c.value===o.cat)){ DATA.lists[ck].push({value:o.cat,label:cn.value.trim()}); await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:ck,value:DATA.lists[ck]})}); } }
+  delete o.catnew;
+  if(!o.alt) o.alt=o.title||o.cap||"";
+  if(key==="news"&&i<0) o.share=o.title;
+  if(key==="leaders"&&(((o.naam||"").trim()||(o.pad||"").trim()))){ o.cap=(((o.pad||"").trim()+" "+(o.naam||"").trim()).trim()); o.alt=o.cap; }
+  if((key==="leaders"||key==="news"||key==="gallery")&&!o.img){ toast("📷 पहले Photo upload करें"); return; }
+  if(key==="leaders"&&!((o.naam||"").trim()&&(o.pad||"").trim())&&!(o.cap||"").trim()){ toast("नाम + पद भरें"); return; }
+  if((key==="news"||key==="gallery"||key==="activities")&&!((o.title||o.cap||"").trim())){ toast("Title / Caption भरें"); return; }
+  if(key==="members"&&!((o.name||"").trim()&&(o.phone||"").trim())){ toast("नाम + मोबाइल भरें"); return; }
+  if(key==="donors"&&!(o.name||"").trim()){ toast("नाम भरें"); return; }
+  if(key==="objectives"&&!(o.text||"").trim()){ toast("उद्देश्य लिखें"); return; }
+  if((key==="notices"||key==="consumer")&&!(o.title||"").trim()){ toast("Title भरें"); return; }
   if(i<0) DATA.lists[key].push(o);
   await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:key,value:DATA.lists[key]})});
   closeModal(); nav(); toast("Saved ✓"); autoPub();
+};
+/* ---------- NEWSROOM EDITOR (reference-style full page) ---------- */
+const ED_TITLES={leaders:["नेतृत्व","🧑‍💼"],news:["समाचार","📰"],activities:["गतिविधि","📅"],gallery:["गैलरी फोटो","🖼"],ads:["विज्ञापन","📢"]};
+const ED_BACK={leaders:"home",news:"news",activities:"activities",gallery:"gallery",ads:"ads"};
+const ED_CATS={news:"newsCats",activities:"actCats",gallery:"galCats"};
+const ED_WHERE={leaders:"🏠 Home + ℹ️ About के ‘मुख्य पदाधिकारी’ grid में",news:"📰 समाचार page के grid में (category filter सहित)",activities:"📅 गतिविधियां page की timeline में",gallery:"🖼 मीडिया गैलरी grid में",ads:"अंदर के pages की ad-strip में (rotate होती है)"};
+function edBlank(key){
+  if(key==="leaders") return {img:"",naam:"",pad:"",full:false,active:true};
+  if(key==="news") return {img:"",cat:"event",tag:"संगठन समाचार",title:"",date:"नया अपडेट",desc:"",share:"",active:true};
+  if(key==="activities") return {img:"",cat:"event",tag:"कार्यक्रम",title:"",date:"",place:"",desc:"",active:true};
+  if(key==="gallery") return {img:"",cap:"",cat:"event",tall:false,active:true};
+  return {label:"विज्ञापन",title:"",text:"",cta:"",href:"",theme:"house",active:true};
+}
+function edUploader(img){
+  return `<label class="f">📷 Photo ${img?"":"*"}</label>
+  <div class="upbox">${img?`<img id="ed-preview" src="/${img}">`:`<div class="up-empty" id="ed-empty">📷<br>कोई photo नहीं<br><small>नीचे से चुनें</small></div><img id="ed-preview" style="display:none">`}</div>
+  <div class="up-btns"><select id="ed-folder" style="flex:0 0 120px"><option value="gallery">gallery</option><option value="leaders">leaders</option><option value="misc">misc</option></select>
+  <label class="btn btn-b btn-sm">📁 Choose File<input type="file" id="ed-file" accept="image/*" hidden></label>
+  <button class="btn btn-g btn-sm" onclick="openPicker()">🖼 Library</button>
+  <button class="btn btn-g btn-sm" onclick="clearEdImg()">✕ हटाएं</button></div>
+  <input type="hidden" id="ed-img" value="${img||""}">`;
+}
+function edCatSel(cur,catsKey){
+  const cats=(DATA.lists[catsKey]||[]);
+  return `<label class="f">Category *</label><select id="ed-cat">${cats.map(c=>`<option value="${c.value}" ${c.value===cur?"selected":""}>${c.label}</option>`).join("")}</select><input type="text" id="ed-catnew" placeholder="या नई category (english) लिखें" style="margin-top:6px">`;
+}
+function edMainFields(key,it){
+  const esc=s=>String(s??"").replace(/"/g,"&quot;");
+  if(key==="leaders") return edUploader(it.img)+`<label class="f">नाम *</label><input type="text" id="ed-naam" value="${esc(it.naam)}" placeholder="जैसे — आलोक दुवेदी"><label class="f">पद *</label><input type="text" id="ed-pad" value="${esc(it.pad)}" placeholder="जैसे — प्रभारी उत्तर प्रदेश…"><label class="f"><input type="checkbox" id="ed-full" ${it.full?"checked":""}> Full-frame (बिना कटे)?</label>`;
+  if(key==="news") return edUploader(it.img)+edCatSel(it.cat,"newsCats")+`<label class="f">Title *</label><input type="text" id="ed-title" class="ed-title" value="${esc(it.title)}" placeholder="खबर का शीर्षक…"><label class="f">Tag (Hindi)</label><input type="text" id="ed-tag" value="${esc(it.tag)}"><label class="f">Date line</label><input type="text" id="ed-date" value="${esc(it.date)}"><label class="f">Description</label><textarea id="ed-desc" oninput="edCount(this)" placeholder="पूरी खबर…">${(it.desc||"").replace(/</g,"&lt;")}</textarea><div class="count" id="ed-count"></div>`;
+  if(key==="activities") return edUploader(it.img)+`<label class="f">Title *</label><input type="text" id="ed-title" class="ed-title" value="${esc(it.title)}" placeholder="गतिविधि का नाम…">`+edCatSel(it.cat,"actCats")+`<label class="f">Tag (Hindi)</label><input type="text" id="ed-tag" value="${esc(it.tag)}"><label class="f">Date</label><input type="text" id="ed-date" value="${esc(it.date)}"><label class="f">Place</label><input type="text" id="ed-place" value="${esc(it.place)}"><label class="f">Description</label><textarea id="ed-desc" oninput="edCount(this)">${(it.desc||"").replace(/</g,"&lt;")}</textarea><div class="count" id="ed-count"></div>`;
+  if(key==="gallery") return edUploader(it.img)+`<label class="f">Caption *</label><input type="text" id="ed-cap" value="${esc(it.cap)}" placeholder="फोटो के नीचे दिखेगा…">`+edCatSel(it.cat,"galCats")+`<label class="f"><input type="checkbox" id="ed-tall" ${it.tall?"checked":""}> Tall frame?</label>`;
+  return `<label class="f">Badge</label><input type="text" id="ed-label" value="${esc(it.label)}"><label class="f">Title *</label><input type="text" id="ed-title" class="ed-title" value="${esc(it.title)}"><label class="f">Text</label><textarea id="ed-text">${(it.text||"").replace(/</g,"&lt;")}</textarea><label class="f">Button text</label><input type="text" id="ed-cta" value="${esc(it.cta)}"><label class="f">Button link</label><input type="text" id="ed-href" value="${esc(it.href)}"><label class="f">Theme</label><select id="ed-theme"><option ${it.theme==="house"?"selected":""}>house</option><option ${it.theme==="t1"?"selected":""}>t1</option><option ${it.theme==="t2"?"selected":""}>t2</option></select>`;
+}
+function vEditor(key,idx){
+  if(!ED_TITLES[key]){ location.hash="#home"; return; }
+  const isNew=idx==="new";
+  const item=isNew?edBlank(key):DATA.lists[key][+idx];
+  if(!item){ location.hash="#"+ED_BACK[key]; return; }
+  const tname=ED_TITLES[key][0], emoji=ED_TITLES[key][1];
+  $("#view").innerHTML=`
+  <div class="ed-top"><a class="btn btn-g btn-sm" href="#${ED_BACK[key]}">← वापस</a><h2>${emoji} ${isNew?("नया "+tname+" जोड़ें"):(tname+" edit करें")}</h2>${(!isNew&&item.active===false)?'<span class="badge off">draft</span>':""}</div>
+  <div class="ed-grid"><div class="card">${edMainFields(key,item)}</div>
+  <aside><div class="card publish-box"><h2>🚀 Publish</h2>
+    <div class="switch"><span>Status</span><select id="ed-active" style="width:auto"><option value="1" ${item.active!==false?"selected":""}>✅ Live</option><option value="0" ${item.active===false?"selected":""}>📝 Draft</option></select></div>
+    <div class="pub-row"><button class="btn btn-s" onclick="saveEditor('${key}',${isNew?"-1":+idx})">💾 Save</button></div>
+    <div class="pub-row"><button class="btn btn-g" onclick="previewEditor('${key}')">👁 Preview</button>${!isNew?`<button class="btn btn-r" onclick="if(confirm('Delete करें?')){delItem('${key}',${+idx});location.hash='#${ED_BACK[key]}';}">Del</button>`:""}</div>
+    <p class="mut">${AUTOPUB?"Save = तुरंत LIVE 🚀":"Save के बाद Publish दबाएं"}</p></div>
+  <div class="card"><h2>ℹ️ कहां दिखेगा</h2><p class="mut">${ED_WHERE[key]}</p></div></aside></div>`;
+  wireEditor();
+}
+function wireEditor(){
+  const fi=$("#ed-file"); if(fi) fi.onchange=function(){ uploadEdFile(fi.files[0]); };
+  const d=$("#ed-desc"); if(d) edCount(d);
+}
+window.edCount=function(t){ const c=$("#ed-count"); if(c) c.textContent=(t.value||"").length+" अक्षर"; };
+async function uploadEdFile(f){
+  if(!f) return; toast("Uploading…");
+  const buf=await f.arrayBuffer(); let b64=""; const bytes=new Uint8Array(buf);
+  for(let i=0;i<bytes.length;i+=0x8000) b64+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
+  const mime=f.type==="image/png"?"image/png":f.type==="image/webp"?"image/webp":"image/jpeg";
+  try{ const d=await api("/api/upload",{method:"POST",body:JSON.stringify({name:f.name,folder:(($("#ed-folder")||{}).value)||"gallery",data:`data:${mime};base64,${btoa(b64)}`})});
+    setEdImg(d.path); toast("Uploaded ✓");
+  }catch(e){ toast(e.message); }
+}
+function setEdImg(p){ const h=$("#ed-img"); if(h) h.value=p; const im=$("#ed-preview"); if(im){ im.src="/"+p; im.style.display=""; } const em=$("#ed-empty"); if(em) em.style.display="none"; }
+window.clearEdImg=function(){ const h=$("#ed-img"); if(h) h.value=""; const im=$("#ed-preview"); if(im) im.style.display="none"; const em=$("#ed-empty"); if(em) em.style.display=""; };
+window.openPicker=async function(){
+  const d=await api("/api/media");
+  const imgs=d.files.filter(f=>!f.path.endsWith(".mp4"));
+  openModal(`<h2>🖼 Library से चुनें</h2><div class="media-grid">${imgs.map(f=>`<figure style="cursor:pointer" onclick="pickImg('${f.path}')"><img src="/${f.path}" loading="lazy"><figcaption>${f.path.split("/").pop()}</figcaption></figure>`).join("")||'<p class="mut">कोई photo नहीं — ऊपर Choose File से upload करें।</p>'}</div><div style="margin-top:12px"><button class="btn btn-g" onclick="closeModal()">Cancel</button></div>`);
+};
+window.pickImg=function(p){ setEdImg(p); closeModal(); };
+function gatherEditor(key){
+  const gv=id=>{ const el=$("#"+id); if(!el) return ""; return el.type==="checkbox" ? !!el.checked : (el.value||""); };
+  const o={img:gv("ed-img")};
+  let err="";
+  const needImg=(key==="leaders"||key==="news"||key==="gallery");
+  if(needImg&&!o.img) err="📷 पहले Photo लगाएं (Choose File / Library)";
+  if(key==="leaders"){ o.naam=gv("ed-naam"); o.pad=gv("ed-pad"); o.full=!!gv("ed-full");
+    if(o.naam&&o.pad) o.cap=o.pad+" "+o.naam; o.alt=o.cap||o.naam;
+    if(!err&&!(o.naam&&o.pad)&&!o.cap) err="नाम + पद भरें"; }
+  if(key==="news"){ o.cat=gv("ed-cat"); o.title=gv("ed-title"); o.tag=gv("ed-tag"); o.date=gv("ed-date"); o.desc=gv("ed-desc"); o.share=o.title; o.alt=o.title;
+    if(!err&&!o.title) err="Title भरें"; }
+  if(key==="activities"){ o.cat=gv("ed-cat"); o.title=gv("ed-title"); o.tag=gv("ed-tag"); o.date=gv("ed-date"); o.place=gv("ed-place"); o.desc=gv("ed-desc"); o.alt=o.title;
+    if(!err&&!o.title) err="Title भरें"; }
+  if(key==="gallery"){ o.cap=gv("ed-cap"); o.cat=gv("ed-cat"); o.tall=!!gv("ed-tall"); o.alt=o.cap;
+    if(!err&&!o.cap) err="Caption भरें"; }
+  if(key==="ads"){ o.label=gv("ed-label"); o.title=gv("ed-title"); o.text=gv("ed-text"); o.cta=gv("ed-cta"); o.href=gv("ed-href"); o.theme=gv("ed-theme");
+    if(!err&&!o.title) err="Title भरें"; }
+  const cn=gv("ed-catnew");
+  if(cn&&cn.trim()) o._newcat=cn.trim();
+  return {o:o,err:err};
+}
+window.saveEditor=async function(key,idx){
+  const g=gatherEditor(key);
+  if(g.err){ toast(g.err); return; }
+  const o=g.o;
+  if(o._newcat){ o.cat=o._newcat.toLowerCase().replace(/\s+/g,"-"); const ck={news:"newsCats",activities:"actCats",gallery:"galCats"}[key];
+    if(ck&&!DATA.lists[ck].some(c=>c.value===o.cat)){ DATA.lists[ck].push({value:o.cat,label:o._newcat}); await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:ck,value:DATA.lists[ck]})}); } }
+  delete o._newcat;
+  o.active=(($("#ed-active")||{}).value)!=="0";
+  if(idx<0){ DATA.lists[key].push(o); } else { Object.assign(DATA.lists[key][idx],o); }
+  await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:key,value:DATA.lists[key]})});
+  toast("Saved ✓"); autoPub(); location.hash="#"+ED_BACK[key];
+};
+window.previewEditor=function(key){
+  const g=gatherEditor(key);
+  if(g.err){ toast(g.err); return; }
+  const o=g.o, title=o.title||o.cap||"(बिना शीर्षक)";
+  const img=o.img?`<img src="/${o.img}" style="width:100%;max-height:300px;object-fit:cover;border-radius:12px">`:`<div style="background:#0a1a3c;color:#fff;padding:40px;text-align:center;border-radius:12px">📷 कोई photo नहीं</div>`;
+  openModal(`<h2>👁 Preview — website पर ऐसा दिखेगा</h2>${img}<h2 style="color:#0a1a3c;margin:12px 0 6px">${title}</h2><p style="color:#5b6474">${o.desc||o.tag||o.cat||""}</p><div style="margin-top:12px"><button class="btn btn-g" onclick="closeModal()">बंद करें</button></div>`);
 };
 window.delItem=async function(key,i){
   if(!confirm("Delete करें?")) return;
@@ -255,8 +477,6 @@ window.moveItem=async function(key,i,d){
   await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:key,value:a})});
   nav(); autoPub();
 };
-const imgCell=it=>it.img?`<img class="th" src="/${it.img}">`:"-";
-const actBadge=it=>it.active===false?'<span class="badge off">hidden</span>':'<span class="badge">live</span>';
 function vAds(){
   $("#view").innerHTML=listTableHTML("📢 विज्ञापन Slides","ads",AD_COLS)
   +`<div class="card"><h2>🏷 Category Chips</h2><p class="mut">नई category यहां जोड़ें — chips अपने-आप बनेंगे।</p>${CATLIST("newsCats","News categories")+CATLIST("actCats","Activity categories")+CATLIST("galCats","Gallery categories")}</div>`;
@@ -278,6 +498,99 @@ window.delCat=async function(key,i){
   DATA.lists[key].splice(i,1);
   await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:key,value:DATA.lists[key]})});
   nav(); autoPub();
+};
+
+/* ---------- NEW MANAGERS ---------- */
+Object.assign(FORMS,{members:formMember,notices:formNotice,donors:formDonor,objectives:formObjective,consumer:formConsumer});
+const MEM_COLS=[["img","Photo",imgCell],["name","नाम"],["memberId","ID"],["phone","फोन"],["newspaper","अखबार"]];
+const NOT_COLS=[["title","Title"],["kind","प्रकार"],["date","तारीख"]];
+const DON_COLS=[["name","नाम"],["amount","राशि ₹"],["date","तारीख"]];
+const OBJ_COLS=[["text","उद्देश्य"]];
+const CON_COLS=[["title","Title"],["date","तारीख"]];
+function formMember(it){ return `${fld2("img",it.img||"","📷 Photo (ID कार्ड के लिए)")}${fld2("name",it.name||"","पूरा नाम *")}${fld2("phone",it.phone||"","मोबाइल नंबर *")}${fld2("memberId",it.memberId||"","ID संख्या *")}${fld2("address",it.address||"","पता")}${fld2("newspaper",it.newspaper||"","अखबार का नाम *")}<label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function formNotice(it){ return `<label class="f">प्रकार *</label><select data-k="kind"><option value="event" ${(!it.kind||it.kind==="event")?"selected":""}>📅 आगामी कार्यक्रम</option><option value="achieve" ${it.kind==="achieve"?"selected":""}>🏆 उपलब्धि</option><option value="convention" ${it.kind==="convention"?"selected":""}>🎪 अधिवेशन</option></select>${fld2("title",it.title||"","Title *")}${fld2("date",it.date||"","तारीख")}${fld2("place",it.place||"","स्थान")}<label class="f">विवरण</label><textarea data-k="desc">${it.desc||""}</textarea><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function formDonor(it){ return `${fld2("name",it.name||"","दानदाता का नाम *")}${fld2("amount",it.amount||"","राशि ₹")}${fld2("date",it.date||"","तारीख")}${fld2("note",it.note||"","नोट (optional)")}<label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function formObjective(it){ return `<label class="f">उद्देश्य *</label><textarea data-k="text" placeholder="संस्था का उद्देश्य लिखें…">${it.text||""}</textarea><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function formConsumer(it){ return `${fld2("title",it.title||"","Title *")}${fld2("date",it.date||"","तारीख")}<label class="f">विवरण</label><textarea data-k="desc" placeholder="कार्यक्रम का विवरण…">${it.desc||""}</textarea><label class="f">Live? <input type="checkbox" data-k="active" ${it.active!==false?"checked":""}></label>`; }
+function vMembers(){ $("#view").innerHTML=`<div class="card"><h2>🧑‍💼 सदस्य प्रबंधन</h2><p class="mut">नाम, फोन, ID संख्या, पता, अखबार — जोड़ें/हटाएं। फोन नंबर सिर्फ admin में रहेगा (website पर public नहीं होगा)। ID कार्ड नीचे 👇</p></div>`+listTableHTML("सदस्य सूची","members",MEM_COLS); }
+function vNotices(){ $("#view").innerHTML=`<div class="card"><h2>📣 घोषणाएं</h2><p class="mut">आगामी कार्यक्रम / उपलब्धि / अधिवेशन — Activities page पर दिखेंगी।</p></div>`+listTableHTML("घोषणा जोड़ें","notices",NOT_COLS); }
+function vDonors(){ $("#view").innerHTML=`<div class="card"><h2>❤️ दानदाता</h2><p class="mut">दान देने वालों के नाम — Membership page की दानदाता दीवार पर दिखेंगे।</p></div>`+listTableHTML("दानदाता जोड़ें","donors",DON_COLS); }
+function vObjectives(){ $("#view").innerHTML=`<div class="card"><h2>🎯 संस्था के उद्देश्य</h2><p class="mut">Home + About page की उद्देश्य-सूची। Order: ▲▼।</p></div>`+listTableHTML("उद्देश्य जोड़ें","objectives",OBJ_COLS); }
+function vConsumerPg(){ $("#view").innerHTML=`<div class="card"><h2>📄 जागरूकता पेज</h2><p class="mut">उपभोक्ता जागरूकता कार्यक्रम — <a href="/consumer.html" target="_blank">consumer.html</a> पर दिखेंगे।</p></div>`+listTableHTML("कार्यक्रम जोड़ें","consumer",CON_COLS); }
+function idcHTML(m){
+  const base=location.origin;
+  return `<div class="idcard"><div class="id-head"><img src="${base}/assets/logo.jpeg" alt="logo"><div><b>जर्नलिस्ट सेवा परिषद</b><br><small>पत्रकारों का राष्ट्रीय संगठन</small></div></div><div class="id-body">${m.img?`<img class="id-photo" src="${base}/${m.img}" alt="">`:""}<div><b style="font-size:1.05rem">${m.name||""}</b></div><div>ID: <b>${m.memberId||""}</b></div><div>${m.newspaper||""}</div>${m.role?`<div>पद: ${m.role}</div>`:""}<div>मो: ${m.phone||""}</div><div style="font-size:.75rem;color:#666">${m.address||""}</div></div></div>`;
+}
+function vIdCard(){
+  const ms=DATA.lists.members;
+  $("#view").innerHTML=`<div class="card"><h2>🪪 ID कार्ड बनाएं</h2>
+  <label class="f">तरीका चुनें</label><select id="idc-mode" onchange="idcMode()"><option value="pick">सूची से सदस्य चुनें</option><option value="form">नया फॉर्म भरें</option></select>
+  <div id="idc-pick"><label class="f">सदस्य चुनें</label><select id="idc-sel">${ms.map((m,i)=>`<option value="${i}">${(m.name||"नामहीन")+" ("+(m.memberId||"no-id")+")"}</option>`).join("")||"<option value=''>कोई सदस्य नहीं — पहले जोड़ें</option>"}</select></div>
+  <div id="idc-form" style="display:none">
+    <div style="border:2px dashed var(--royal);border-radius:12px;padding:14px;margin:10px 0;background:#f4f7ff"><b>📷 Photo</b><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center"><input type="file" id="idc-file" accept="image/*" style="flex:1;min-width:160px"><button class="btn btn-b btn-sm" onclick="idcUpload()">⬆ Upload</button></div><div id="idc-prev" style="margin-top:8px"></div></div>
+    <input type="hidden" id="idc-img" value="">
+    <label class="f">पूरा नाम *</label><input type="text" id="idc-name" placeholder="जैसे — राम कुमार">
+    <label class="f">ID संख्या *</label><input type="text" id="idc-id" placeholder="जैसे — JSP-001">
+    <label class="f">मोबाइल नंबर</label><input type="text" id="idc-phone" placeholder="10 अंक">
+    <label class="f">अखबार / संस्था</label><input type="text" id="idc-paper" placeholder="जैसे — दैनिक भास्कर">
+    <label class="f">पद / भूमिका</label><input type="text" id="idc-role" placeholder="जैसे — संवाददाता">
+    <label class="f">पता</label><input type="text" id="idc-addr" placeholder="शहर, जिला">
+    <div class="rowbtns" style="margin-top:10px"><button class="btn btn-g btn-sm" onclick="saveFormMember()">＋ सूची में भी save करें</button></div>
+  </div>
+  <div class="rowbtns" style="margin-top:12px"><button class="btn btn-b btn-sm" onclick="idcPreview()">👁 Preview</button><button class="btn btn-s btn-sm" onclick="idcPrint()">🖨 Print</button></div>
+  <div id="idc-out" style="margin-top:16px"></div></div>`;
+}
+window.idcMode=function(){ const m=(($("#idc-mode")||{}).value)||"pick"; const p=$("#idc-pick"),f=$("#idc-form"); if(p)p.style.display=m==="pick"?"":"none"; if(f)f.style.display=m==="form"?"":"none"; const o=$("#idc-out"); if(o)o.innerHTML=""; };
+window.idcUpload=async function(){
+  const fi=$("#idc-file"); const f=fi&&fi.files[0]; if(!f){ toast("पहले Choose File से photo चुनें"); return; }
+  toast("Uploading…");
+  const buf=await f.arrayBuffer(); let b64=""; const bytes=new Uint8Array(buf);
+  for(let i=0;i<bytes.length;i+=0x8000) b64+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
+  const mime=f.type==="image/png"?"image/png":f.type==="image/webp"?"image/webp":"image/jpeg";
+  try{ const d=await api("/api/upload",{method:"POST",body:JSON.stringify({name:f.name,folder:"misc",data:`data:${mime};base64,${btoa(b64)}`})});
+    $("#idc-img").value=d.path; $("#idc-prev").innerHTML=`<img src="/${d.path}" style="max-width:120px;border-radius:10px">`; toast("Uploaded ✓");
+  }catch(e){ toast(e.message); }
+};
+window.idcData=function(){
+  const m=(($("#idc-mode")||{}).value)||"pick";
+  if(m==="form"){
+    const v=id=>((($("#"+id))||{}).value||"").trim();
+    const o={img:v("idc-img"),name:v("idc-name"),memberId:v("idc-id"),phone:v("idc-phone"),newspaper:v("idc-paper"),role:v("idc-role"),address:v("idc-addr")};
+    if(!o.name){ toast("नाम भरें"); return null; }
+    if(!o.memberId){ toast("ID संख्या भरें"); return null; }
+    return o;
+  }
+  const i=+((($("#idc-sel"))||{}).value||""); const mem=DATA.lists.members[i];
+  if(!mem){ toast("सदस्य चुनें"); return null; }
+  return mem;
+};
+window.saveFormMember=async function(){
+  const o=idcData(); if(!o) return;
+  o.active=true;
+  DATA.lists.members.push(o);
+  await api("/api/save",{method:"POST",body:JSON.stringify({kind:"list",id:"members",value:DATA.lists.members})});
+  toast("सूची में saved ✓"); nav();
+};
+window.idcPreview=function(){ const m=idcData(); if(!m) return; $("#idc-out").innerHTML=idcHTML(m); };
+window.idcPrint=function(){
+  const m=idcData(); if(!m) return;
+  const w=window.open("","_blank");
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>ID Card - ${m.name||""}</title><style>body{font-family:sans-serif;display:flex;justify-content:center;padding:30px}.idcard{width:340px;border:2px solid #0a1a3c;border-radius:16px;overflow:hidden}.id-head{background:#0a1a3c;color:#fff;padding:14px;display:flex;gap:10px;align-items:center}.id-head img{width:52px;height:52px;border-radius:50%;background:#fff;object-fit:cover}.id-body{padding:16px;display:grid;gap:6px;font-size:.9rem}.id-photo{width:90px;height:110px;object-fit:cover;border-radius:10px;border:1px solid #ccc}</style></head><body>${idcHTML(m)}<script>onload=function(){setTimeout(function(){print()},400)}<\/script></body></html>`);
+  w.document.close();
+};
+function vSocial(){
+  const s=(DATA.settings&&DATA.settings.social)||{};
+  $("#view").innerHTML=`<div class="card"><h2>🔗 Social Media Links</h2><p class="mut">URL भरते ही footer में icon दिखेगा। खाली = छिपा। News share buttons हर खबर में पहले से हैं।</p>
+  <label class="f">Facebook URL</label><input type="text" id="soc-fb" value="${s.fb||""}" placeholder="https://facebook.com/...">
+  <label class="f">Instagram URL</label><input type="text" id="soc-ig" value="${s.ig||""}" placeholder="https://instagram.com/...">
+  <label class="f">X (Twitter) URL</label><input type="text" id="soc-x" value="${s.x||""}" placeholder="https://x.com/...">
+  <label class="f">YouTube URL</label><input type="text" id="soc-yt" value="${s.yt||""}" placeholder="https://youtube.com/...">
+  <div style="margin-top:14px"><button class="btn btn-s" onclick="saveSocial()">💾 Save</button></div></div>`;
+}
+window.saveSocial=async function(){
+  const v=id=>(document.getElementById(id)||{}).value||"";
+  await api("/api/save",{method:"POST",body:JSON.stringify({kind:"social",value:{fb:v("soc-fb").trim(),ig:v("soc-ig").trim(),x:v("soc-x").trim(),yt:v("soc-yt").trim()}})});
+  await reloadData(); toast("Saved ✓"); autoPub();
 };
 
 /* ---------- MEDIA ---------- */
@@ -373,11 +686,36 @@ window.savePlace=async function(p){
 
 /* ---------- DONATE ---------- */
 function vDonate(){
+  const b=(DATA.settings&&DATA.settings.bank)||{};
   $("#view").innerHTML=`<div class="card"><h2>❤️ दान Settings</h2><p class="mut">Membership page का donate box + QR यहीं से बदलें।</p>
-  <label class="f">Donate QR image path</label><input type="text" id="qrPath" value="">
+  <label class="f">Donate QR image</label>
+  <div style="border:2px dashed var(--royal);border-radius:12px;padding:14px;margin:10px 0;background:#f4f7ff"><b>📷 QR photo upload करें (Choose File)</b><div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center"><input type="file" id="qrFile" accept="image/*" style="flex:1;min-width:160px"><button class="btn btn-b btn-sm" onclick="qrUpload()">⬆ Upload</button></div><div id="qrPrev" style="margin-top:8px"></div></div>
+  <label class="f">QR path (auto-भरेगा)</label><input type="text" id="qrPath" value="">
   <p class="mut">Media Library से QR upload करें (misc folder), path यहां paste करें, Save करें।</p>
-  <div class="rowbtns"><button class="btn btn-s" onclick="saveDonate()">💾 Save</button></div></div>`;
+  <div class="rowbtns"><button class="btn btn-s" onclick="saveDonate()">💾 Save</button></div></div>
+  <div class="card"><h2>🏦 बैंक खाता (donate box में दिखेगा)</h2>
+  <label class="f">UPI ID</label><input type="text" id="bk-upi" value="${b.upiId||""}" placeholder="name@upi">
+  <label class="f">बैंक का नाम</label><input type="text" id="bk-bank" value="${b.bankName||""}">
+  <label class="f">खाता नंबर</label><input type="text" id="bk-acc" value="${b.accNo||""}">
+  <label class="f">IFSC</label><input type="text" id="bk-ifsc" value="${b.ifsc||""}">
+  <label class="f">खाताधारक का नाम</label><input type="text" id="bk-holder" value="${b.holder||""}">
+  <div class="rowbtns" style="margin-top:14px"><button class="btn btn-s" onclick="saveBank()">💾 Save Bank</button></div></div>`;
 }
+window.saveBank=async function(){
+  const v=id=>((document.getElementById(id)||{}).value||"").trim();
+  await api("/api/save",{method:"POST",body:JSON.stringify({kind:"bank",value:{upiId:v("bk-upi"),bankName:v("bk-bank"),accNo:v("bk-acc"),ifsc:v("bk-ifsc"),holder:v("bk-holder")}})}); 
+  await reloadData(); toast("Saved ✓"); autoPub();
+};
+window.qrUpload=async function(){
+  const fi=$("#qrFile"); const f=fi&&fi.files[0]; if(!f){ toast("पहले Choose File से QR चुनें"); return; }
+  toast("Uploading…");
+  const buf=await f.arrayBuffer(); let b64=""; const bytes=new Uint8Array(buf);
+  for(let i=0;i<bytes.length;i+=0x8000) b64+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
+  const mime=f.type==="image/png"?"image/png":f.type==="image/webp"?"image/webp":"image/jpeg";
+  try{ const d=await api("/api/upload",{method:"POST",body:JSON.stringify({name:f.name,folder:"misc",data:`data:${mime};base64,${btoa(b64)}`})});
+    $("#qrPath").value=d.path; $("#qrPrev").innerHTML=`<img src="/${d.path}" style="max-width:150px;border-radius:10px">`; toast("Uploaded ✓");
+  }catch(e){ toast(e.message); }
+};
 window.saveDonate=async function(){
   const p=$("#qrPath").value.trim();
   if(p){ await api("/api/save",{method:"POST",body:JSON.stringify({kind:"field",id:"mem_qr",value:`src="${p}"`})}); }
@@ -443,7 +781,9 @@ function doPreview(){ const h=(location.hash||"#dashboard").slice(1); window.ope
 /* ---------- HELP ---------- */
 function vHelp(){
   $("#view").innerHTML=`<div class="card help"><h2>❓ Guide (Hindi) — नया आसान system</h2><ol>
-  <li><b>Photo + नाम एक साथ:</b> 📁 Media → Upload → popup में कहां लगाना है चुनें (नेतृत्व/गैलरी/समाचार) + नाम भरें → <b>Save + Publish = तुरंत LIVE</b> 🎉</li>
+  <li><b>नया प्रबंधन:</b> 🧑‍💼 सदस्य (ID कार्ड सहित) • 📣 घोषणाएं (कार्यक्रम/उपलब्धि/अधिवेशन) • ❤️ दानदाता • 🎯 उद्देश्य • 📄 जागरूकता पेज • 🏦 बैंक/QR (❤️ दान में) • 🔗 Social links — सब left menu में।</li>
+  <li><b>🪪 ID कार्ड:</b> सदस्य चुनें → Preview → Print।</li>
+  <li><b>नया जोड़ना (editor style):</b> page खोलें → <b>+ नया जोड़ें</b> → Photo (Choose File/Library) → Title → Category → <b>👁 Preview</b> देखकर <b>💾 Save</b> = LIVE 🎉</li>
   <li><b>Har page alag:</b> left menu में 🏠 Home, 📰 News, 🖼 Gallery… हर page का text + add table एक ही जगह।</li>
   <li><b>Auto-publish:</b> ऊपर <b>🚀 Auto: ON</b> है तो हर Save = LIVE। Band करना हो तो OFF करें, फिर Publish दबाएं।</li>
   <li><b>Text बदलना:</b> page खोलें → text edit → Save (auto-live)।</li>

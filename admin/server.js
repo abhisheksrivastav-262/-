@@ -8,8 +8,23 @@ const crypto = require("crypto");
 const PORT = process.env.PORT || 8010;
 const ROOT = path.resolve(__dirname, "..");
 const ADMIN_DIR = __dirname;
-const DB_FILE = path.join(ADMIN_DIR, "data.json");
-const BACKUP_DIR = path.join(ADMIN_DIR, "backups");
+// DATA_ROOT: persistent volume mount (Railway). Unset = local dev behavior exactly.
+const DATA_DIR = process.env.DATA_ROOT ? path.resolve(process.env.DATA_ROOT) : null;
+const DB_FILE = DATA_DIR ? path.join(DATA_DIR, "data.json") : path.join(ADMIN_DIR, "data.json");
+const BACKUP_DIR = DATA_DIR ? path.join(DATA_DIR, "backups") : path.join(ADMIN_DIR, "backups");
+// Overlay read: persistent copy wins when present, else original repo file (never duplicated).
+function dataPath(rel){
+  if(DATA_DIR){
+    try{ const p=path.join(DATA_DIR, rel); if(fs.existsSync(p)&&fs.statSync(p).isFile()) return p; }catch(e){}
+  }
+  return path.join(ROOT, rel);
+}
+// Overlay write: persistent copy when volume active (parents auto-created), else repo file.
+function dataWritePath(rel){
+  const base = DATA_DIR ? path.join(DATA_DIR, rel) : path.join(ROOT, rel);
+  try{ fs.mkdirSync(path.dirname(base), {recursive:true}); }catch(e){}
+  return base;
+}
 const HTML_FILES = ["index.html","about.html","journalist-welfare.html","membership.html","activities.html","news.html","gallery.html","contact.html","privacy-policy.html","terms.html"];
 const MAIN_JS = "js/main.js";
 
@@ -57,7 +72,7 @@ function slugify(s,i){
 }
 function staticADS(){
   try{
-    const js=fs.readFileSync(path.join(ROOT,MAIN_JS),"utf8");
+    const js=fs.readFileSync(dataPath(MAIN_JS),"utf8");
     const m=js.match(/const ADS = (\[[\s\S]*?\n  \]);/);
     return (new Function("return "+m[1]))();
   }catch(e){ return null; }
@@ -318,7 +333,7 @@ async function mirrorInboxWrite(entry,del){
 }
 async function mirrorUpload(localRel,user){
   try{
-    const fp=path.join(ROOT,localRel);
+    const fp=dataPath(localRel);
     if(!fs.existsSync(fp)) return;
     const buf=fs.readFileSync(fp);
     const ext=path.extname(fp).toLowerCase();
@@ -469,7 +484,7 @@ function bareTag(s){
 }
 
 /* ================= SEED (parse current HTML → DB lists) ================= */
-function readF(f){ return fs.readFileSync(path.join(ROOT,f),"utf8"); }
+function readF(f){ return fs.readFileSync(dataPath(f),"utf8"); }
 function escQ(s){ return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;"); }
 function seedDB(){
   const L = DB.lists;
@@ -687,11 +702,11 @@ function doPublish(){
   const bdir=path.join(BACKUP_DIR,ts); fs.mkdirSync(bdir);
   const changedFiles=[];
   for(const f of [...HTML_FILES,"consumer.html",MAIN_JS]){
-    const fp=path.join(ROOT,f);
+    const fp=dataPath(f);
     const orig=fs.readFileSync(fp,"utf8");
     fs.writeFileSync(path.join(bdir,f.replace(/\//g,"_")+".bak"),orig);
     const {content,changed}=transformFile(f,orig,warnings);
-    if(changed){ fs.writeFileSync(fp,content); changedFiles.push(f); }
+    if(changed){ fs.writeFileSync(dataWritePath(f),content); changedFiles.push(f); }
   }
   // prune backups (keep 10)
   const all=fs.readdirSync(BACKUP_DIR).sort();
@@ -717,8 +732,9 @@ function serveStatic(req,res,pathname){
     if(rel==="/") rel="/index.html";
     rel=path.normalize(rel).replace(/^(\.\.[\/\\])+/,"");
     if(rel.includes("admin"+path.sep+"data.json")||rel.includes("admin/backups")||rel.includes(".git")){ send(res,403,"Forbidden","text/plain"); return; }
-    const fp=path.join(ROOT,rel);
-    if(!fp.startsWith(ROOT)||!fs.existsSync(fp)||fs.statSync(fp).isDirectory()){ res.writeHead(404,{"Content-Type":"text/html"}); res.end(fs.readFileSync(path.join(ROOT,"404.html"))); return; }
+    let fp=path.join(ROOT,rel);
+    if(DATA_DIR){ try{ const dp=path.join(DATA_DIR,rel); if(fs.existsSync(dp)&&fs.statSync(dp).isFile()) fp=dp; }catch(e){} }
+    if((!fp.startsWith(ROOT))&&!(DATA_DIR&&fp.startsWith(DATA_DIR))||!fs.existsSync(fp)||fs.statSync(fp).isDirectory()){ res.writeHead(404,{"Content-Type":"text/html"}); res.end(fs.readFileSync(path.join(ROOT,"404.html"))); return; }
     const stat=fs.statSync(fp);
     const ct=MIME[path.extname(fp).toLowerCase()]||"application/octet-stream";
     const range=req.headers.range;
@@ -733,17 +749,20 @@ function serveStatic(req,res,pathname){
   }catch(e){ send(res,500,"Server error","text/plain"); }
 }
 function listMedia(){
+  const seen={};
   const out=[];
   const walk=(dir,rel)=>{ for(const n of fs.readdirSync(dir)){ const p=path.join(dir,n); const r=rel?rel+"/"+n:n;
     if(fs.statSync(p).isDirectory()){ if(n.startsWith(".")) continue; walk(p,r); }
-    else if(/\.(jpe?g|png|webp|svg|mp4)$/i.test(n)) out.push({path:"assets/"+r.replace(/^assets\//,""), size:fs.statSync(p).size}); } };
+    else if(/\.(jpe?g|png|webp|svg|mp4)$/i.test(n)){ const key="assets/"+r.replace(/^assets\//,""); if(!seen[key]){ seen[key]=1; out.push({path:key, size:fs.statSync(p).size}); } } } };
+  // persistent copies first (they shadow repo originals), then repo tree
+  if(DATA_DIR){ try{ const d=path.join(DATA_DIR,"assets"); if(fs.existsSync(d)) walk(d,""); }catch(e){} }
   const a=path.join(ROOT,"assets"); if(fs.existsSync(a)) walk(a,"");
   return out.sort((x,y)=>x.path.localeCompare(y.path));
 }
 function mediaUsage(rel){
   const uses=[];
   for(const f of [...HTML_FILES,MAIN_JS,"css/style.css"]){
-    try{ const h=fs.readFileSync(path.join(ROOT,f),"utf8"); if(h.includes(rel)) uses.push(f); }catch(e){}
+    try{ const h=fs.readFileSync(dataPath(f),"utf8"); if(h.includes(rel)) uses.push(f); }catch(e){}
   }
   return uses;
 }
@@ -817,7 +836,8 @@ async function api(req,res,url){
     if(m[1].startsWith("video")&&(b.folder||"")!=="video"){ send(res,400,{error:"video sirf video folder me"}); return; }
     let base=String(b.name||"file").replace(/\.[^.]+$/,"").normalize("NFKD").replace(/[^\w\- ]+/g,"").trim().replace(/\s+/g,"-").toLowerCase().slice(0,60)||"file";
     const folder=String(b.folder||"misc").replace(/[^a-z]/g,"")||"misc";
-    const dir=path.join(ROOT,"assets",folder); fs.mkdirSync(dir,{recursive:true});
+    const assetsBase=DATA_DIR?path.join(DATA_DIR,"assets"):path.join(ROOT,"assets");
+    const dir=path.join(assetsBase,folder); fs.mkdirSync(dir,{recursive:true});
     let name=base+ext,i=1; while(fs.existsSync(path.join(dir,name))) name=base+"-"+(i++)+ext;
     fs.writeFileSync(path.join(dir,name),Buffer.from(m[2],"base64"));
     logAct(me.user,"upload assets/"+folder+"/"+name); saveDB(); pubInvalidate();
@@ -827,7 +847,11 @@ async function api(req,res,url){
     const b=JSON.parse(await parseBody(req,1024*10)||"{}");
     const rel=String(b.path||"").replace(/\.\./g,"");
     if(!rel.startsWith("assets/")){ send(res,400,{error:"invalid"}); return; }
-    const fp=path.join(ROOT,rel); if(fs.existsSync(fp)) fs.unlinkSync(fp);
+    const fpList=[];
+    if(DATA_DIR){ try{ const dp=path.join(DATA_DIR,rel); if(fs.existsSync(dp)&&fs.statSync(dp).isFile()) fpList.push(dp); }catch(e){} }
+    try{ const rp=path.join(ROOT,rel); if(fs.existsSync(rp)&&fs.statSync(rp).isFile()&&fpList.indexOf(rp)===-1) fpList.push(rp); }catch(e){}
+    // NOTE: without DATA_DIR this deletes exactly the repo file (unchanged legacy behavior).
+    fpList.forEach(p=>{ try{ fs.unlinkSync(p); }catch(e){} });
     logAct(me.user,"delete "+rel); saveDB(); pubInvalidate();
     try{ bg(()=>mirrorDeleteMedia(rel)); }catch(e){ sbLog("delete mirror trigger failed"); }
     send(res,200,{ok:true}); return; }
@@ -871,7 +895,7 @@ async function api(req,res,url){
     const bdir=path.join(BACKUP_DIR,path.basename(b.backup||""));
     if(!fs.existsSync(bdir)){ send(res,404,{error:"backup nahi mila"}); return; }
     for(const f of fs.readdirSync(bdir)){ const orig=f.replace(/\.bak$/,"").replace(/_/g,"/");
-      const src=path.join(bdir,f), dst=path.join(ROOT,orig);
+      const src=path.join(bdir,f), dst=dataWritePath(orig);
       if(fs.existsSync(dst)) fs.copyFileSync(src,dst); }
     logAct(me.user,"ROLLBACK "+b.backup); saveDB(); send(res,200,{ok:true}); return; }
   if(url.startsWith("/api/preview")){ const p=new URL(req.url,"http://x").searchParams.get("page")||"index.html";

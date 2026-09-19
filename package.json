@@ -1,0 +1,12 @@
+{
+  "name": "journalist-seva-parishad",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Journalist Seva Parishad — static site + Node admin backend (zero dependencies)",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node admin/server.js"
+  }
+}

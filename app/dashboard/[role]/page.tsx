@@ -1,0 +1,7 @@
+import {redirect,notFound} from 'next/navigation';
+import {getVerifiedRole,roles,roleLabels,type AppRole} from '../../auth/server';
+import {UserManagement} from './user-management';
+import {ContentManager} from './content-manager';
+import {OrganizationManager} from './organization-manager';
+import {ApplicationManager} from './application-manager';
+export default async function Dashboard({params}:{params:Promise<{role:string}>}){const {role:requested}=await params;if(!roles.includes(requested as AppRole))notFound();const {user,role,active}=await getVerifiedRole();if(!user)redirect(`/login/${requested}`);if(!active)redirect('/account-inactive');if(!role)redirect('/login');if(role!==requested)redirect(`/dashboard/${role}`);return <section className="simplecontent"><div className="wrap dashboard"><div className="dashhead"><div><div className="eyebrow dark">सुरक्षित कार्यक्षेत्र</div><h1>{roleLabels[role]} डैशबोर्ड</h1><p>{user.email}</p></div><form action="/api/auth/logout" method="post"><button className="button outline darkoutline">लॉगआउट</button></form></div>{role!=='member'&&<UserManagement/>}{role!=='member'&&<ApplicationManager/>}{['super_admin','admin'].includes(role)&&<OrganizationManager/>}{role==='super_admin'&&<ContentManager/>}{role==='member'&&<div className="emptycms">सदस्य प्रोफ़ाइल, डिजिटल पहचान पत्र, भुगतान और शिकायत पोर्टल अभी Phase 2 में उपलब्ध नहीं हैं।</div>}</div></section>}

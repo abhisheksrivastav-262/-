@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { PublicForm } from '../public-form';
 import { GalleryAlbums } from '../gallery-albums';
+import { RepresentativePhotoStrip } from '../representative-photo-strip';
 import { createClient } from '../supabase';
 import { representativeImages, type RepresentativeImage } from '../representative-images';
 
@@ -17,11 +18,11 @@ const pages: Record<string, PageInfo> = {
   membership: { eyebrow: 'सहभागिता', title: 'सदस्यता की जानकारी', intro: 'इच्छुक व्यक्ति आवेदन जमा कर सकते हैं। आवेदन समिति द्वारा समीक्षा के लिए भेजा जाता है; स्वीकृति से पहले कोई सदस्यता संख्या या खाता नहीं बनता।', kind: 'join', art: 'volunteers' },
   join: { eyebrow: 'सहभागिता', title: 'सदस्यता के लिए आवेदन', intro: 'आवेदन समिति की समीक्षा के लिए जमा होगा। इस प्रारंभिक फ़ॉर्म में केवल आवश्यक संपर्क विवरण लिए जाते हैं।', kind: 'join', art: 'volunteers' },
   leadership: { eyebrow: 'संगठन', title: 'प्रबंधन टीम', intro: 'केवल Admin CMS में प्रकाशित अधिकृत पदाधिकारी यहाँ दिखेंगे।' },
-  projects: { eyebrow: 'जनकल्याण', title: 'परियोजनाएँ', intro: 'समिति द्वारा CMS में प्रकाशित परियोजनाएँ और उपलब्ध विवरण।', kind: 'projects', art: 'volunteers' },
-  news: { eyebrow: 'समाचार एवं घोषणाएँ', title: 'समाचार और अपडेट', intro: 'समिति द्वारा प्रकाशित समाचार और घोषणाएँ। अलग सार्वजनिक notices तालिका उपलब्ध नहीं है; प्रकाशित समाचार ही यहाँ दिखते हैं।', kind: 'news', art: 'kumbh' },
-  notices: { eyebrow: 'सूचनाएँ', title: 'सूचनाएँ और घोषणाएँ', intro: 'प्रकाशित समाचार CMS से उपलब्ध घोषणाएँ। इस project में अलग notice management table नहीं है।', kind: 'news', art: 'kumbh' },
+  projects: { eyebrow: 'जनकल्याण', title: 'परियोजनाएँ', intro: 'समिति की प्रकाशित परियोजनाएँ और उनके सत्यापित विवरण।', kind: 'projects', art: 'volunteers' },
+  news: { eyebrow: 'समाचार एवं घोषणाएँ', title: 'समाचार और कार्यक्रम', intro: 'समिति द्वारा प्रकाशित समाचार, घोषणाएँ और आगामी कार्यक्रम। कार्यक्रमों का विवरण उपलब्ध होने पर नीचे प्रदर्शित होगा।', kind: 'news', art: 'kumbh' },
+  notices: { eyebrow: 'सूचनाएँ', title: 'सूचनाएँ और घोषणाएँ', intro: 'समिति द्वारा प्रकाशित आधिकारिक सूचनाएँ और घोषणाएँ।', kind: 'news', art: 'kumbh' },
   events: { eyebrow: 'कार्यक्रम', title: 'कार्यक्रम और आयोजन', intro: 'समिति द्वारा प्रकाशित कार्यक्रम। तारीख और स्थान तभी दिखेंगे जब वे CMS में दिए गए हों।', kind: 'events', art: 'kumbh' },
-  gallery: { eyebrow: 'गतिविधियों की झलक', title: 'फोटो गैलरी', intro: 'प्रकाशित एल्बम की प्रामाणिक तस्वीरें देखें।' },
+  gallery: { eyebrow: 'गतिविधियों की झलक', title: 'फोटो गैलरी', intro: 'समिति द्वारा प्रकाशित फोटो एल्बम और गतिविधियों की तस्वीरें देखें।' },
   reports: { eyebrow: 'पारदर्शिता', title: 'वार्षिक रिपोर्ट एवं लेखा-परीक्षण', intro: 'अधिकृत प्रशासक द्वारा प्रकाशित रिपोर्ट और दस्तावेज़।' },
   awards: { eyebrow: 'अभिलेख', title: 'सम्मान एवं उपलब्धियाँ', intro: 'केवल CMS में प्रकाशित और सत्यापित अभिलेख प्रदर्शित किए जाते हैं।' },
   donate: { eyebrow: 'समर्थन', title: 'सहयोग के बारे में पूछें', intro: 'ऑनलाइन भुगतान सुविधा सक्रिय नहीं है। सत्यापित भुगतान और अनुपालन व्यवस्था उपलब्ध होने तक इस वेबसाइट पर दान स्वीकार नहीं किया जाता।' },
@@ -39,10 +40,23 @@ async function readPublished(type: string, order = 'created_at') {
   try { const { data, error } = await db.from(type).select('*').eq('published', true).eq('archived', false).order(order, { ascending: false }).limit(60); return error ? [] : data || []; }
   catch { return []; }
 }
+async function readUpcomingEvents() {
+  const db=createClient(); if(!db) return [];
+  try { const {data,error}=await db.from('events').select('*').eq('published',true).eq('archived',false).gte('starts_at',new Date().toISOString()).order('starts_at',{ascending:true}).limit(12); return error?[]:data||[]; }
+  catch { return []; }
+}
 function Empty({ children }: { children: React.ReactNode }) { return <div className="empty-feature"><span>◎</span><div><h3>प्रकाशित सामग्री उपलब्ध नहीं</h3><p>{children}</p></div></div>; }
+function DeclaredWorkAreas() {
+  const areas=[
+    { image:'temple' as const, title:'वेद एवं भारतीय संस्कृति', body:'समिति के घोषित उद्देश्यों में भारतीय संस्कृति का संरक्षण और अध्ययन शामिल है।' },
+    { image:'volunteers' as const, title:'जागरूकता और शिक्षा', body:'धर्म, शिक्षा और जनहित के विषयों पर सामाजिक जागरूकता को प्रोत्साहित करना।' },
+    { image:'kumbh' as const, title:'जनकल्याण और नागरिक सहायता', body:'जनकल्याण, नागरिक सहायता और सामाजिक सेवा के प्रयासों का समन्वय।' },
+  ];
+  return <><Empty>अभी कोई विशिष्ट परियोजना प्रकाशित नहीं है। नीचे समिति के घोषित कार्यक्षेत्रों का परिचय है; इन्हें पूरी हो चुकी परियोजनाओं या उपलब्धियों के रूप में प्रस्तुत नहीं किया जा रहा।</Empty><section className="page-photo-section"><div className="page-lead"><h2>समिति के <i>घोषित कार्यक्षेत्र</i></h2><p>यह परिचय समिति के मौजूदा उद्देश्य-विवरण पर आधारित है। किसी वास्तविक परियोजना का नाम, स्थान, तारीख और परिणाम अधिकृत जानकारी उपलब्ध होने पर ही जोड़ा जाएगा।</p></div><div className="work-area-grid">{areas.map(area=>{const image=representativeImages[area.image];return <article className="work-area-card" key={area.title}><img src={image.src} alt={image.alt} loading="lazy"/><div><small>घोषित कार्यक्षेत्र · प्रतिनिधि तस्वीर</small><h3>{area.title}</h3><p>{area.body}</p><span><a href={image.filePage} target="_blank" rel="noreferrer">{image.author} / Wikimedia Commons</a> · <a href={image.licenseUrl} target="_blank" rel="noreferrer">{image.license}</a> · प्रदर्शन हेतु crop</span></div></article>;})}</div><div className="work-area-cta"><p>समिति की गतिविधियों या सदस्यता के बारे में पूछताछ करें।</p><Link className="button gold" href="/contact">संपर्क करें <span>↗</span></Link></div></section></>;
+}
 function Cards({ items, kind }: { items: any[]; kind: string }) {
   if (!items.length) return <Empty>Admin CMS में अधिकृत जानकारी प्रकाशित होने पर वह यहाँ दिखाई देगी।</Empty>;
-  return <div className="feature-grid">{items.map((item:any)=><article className="feature-card" key={item.id}>
+  return <div className="feature-grid">{items.map((item:any)=><article className="feature-card" id={kind==='news'?item.slug:undefined} key={item.id}>
     {(item.image_path || item.photo_path || item.file_path) && <div className="editorial-image"><img src={item.image_path || item.photo_path || item.file_path} alt={item.title || item.name || 'समिति अभिलेख'} loading="lazy"/></div>}
     <div><small>{item.category || item.location || item.fiscal_year || item.issuer || item.designation || (item.starts_at ? new Date(item.starts_at).toLocaleDateString('hi-IN') : '')}</small><h3>{item.title || item.name}</h3>
       {(item.description || item.body || item.biography) && <p>{item.description || item.body || item.biography}</p>}
@@ -53,9 +67,9 @@ function Cards({ items, kind }: { items: any[]; kind: string }) {
 }
 export default async function ContentPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params; const page = pages[slug]; if (!page) notFound();
-  let items: any[] = [];
+  let items: any[] = [], upcomingEvents: any[] = [];
   if (page.kind === 'projects') items = await readPublished('projects');
-  if (page.kind === 'news') items = await readPublished('news', 'published_at');
+  if (page.kind === 'news') [items, upcomingEvents] = await Promise.all([readPublished('news', 'published_at'), readUpcomingEvents()]);
   if (page.kind === 'events') items = await readPublished('events', 'starts_at');
   if (slug === 'activities' || slug === 'welfare') { const [projects, events] = await Promise.all([readPublished('projects'), readPublished('events','starts_at')]); items = [...projects, ...events]; }
   if (slug === 'leadership') items = await readPublished('management_team','sort_order');
@@ -73,8 +87,10 @@ export default async function ContentPage({ params }: { params: Promise<{ slug: 
       {slug === 'structure' && <><div className="page-lead"><h2>ग्यारह स्तरों का <i>संगठनात्मक ढाँचा</i></h2><p>यह सूची project की मौजूदा संगठन संरचना से ली गई है। वास्तविक इकाई/पदाधिकारी अलग से अधिकृत होने पर प्रकाशित होंगे।</p></div><div className="level-grid">{levels.map((level,i)=><article key={level}><small>स्तर {String(i+1).padStart(2,'0')}</small><b>{level}</b></article>)}</div></>}
       {slug === 'objectives' && <><div className="objective-grid inner-objectives">{objectives.map((text,i)=><article className="objective-card" key={text}><span>{String(i+1).padStart(2,'0')}</span><p>{text}</p></article>)}</div><Link className="textlink" href="/mission-vision">मिशन एवं विजन देखें ↗</Link></>}
       {slug === 'mission-vision' && <div className="mission-grid"><article><span className="eyebrow dark">ध्येय</span><h2>संरक्षण और <i>जागरूकता</i></h2><p>वेद एवं भारतीय संस्कृति का संरक्षण और धर्म एवं सामाजिक जागरूकता को प्रोत्साहित करना।</p></article><article><span className="eyebrow dark">दृष्टि</span><h2>जनकल्याण और <i>सामाजिक सद्भाव</i></h2><p>समिति के घोषित उद्देश्यों में नागरिक सहायता, शिक्षा, जनहित और समाज में शांति तथा विश्वास को बढ़ावा देना शामिल है।</p></article></div>}
-      {slug === 'gallery' && (albums.length ? <GalleryAlbums albums={albums}/> : <Empty>आधिकारिक फोटो एल्बम Admin CMS से प्रकाशित होने पर यहाँ दिखेंगे।</Empty>)}
-      {['projects','news','notices','events','activities','welfare','leadership','reports','awards'].includes(slug) && <Cards items={items} kind={page.kind || slug}/>}
+      {slug === 'gallery' && <><div className="gallery-status">{albums.length ? <GalleryAlbums albums={albums}/> : <Empty>समिति के अपने फोटो एल्बम अभी प्रकाशित नहीं हैं। नीचे की तस्वीरें सांस्कृतिक धरोहर और स्वयंसेवा के प्रतिनिधि उदाहरण हैं; वे समिति के कार्यक्रमों की तस्वीरें नहीं हैं।</Empty>}</div><section className="page-photo-section"><div className="page-lead"><h2>संस्कृति और सेवा के <i>प्रतिनिधि चित्र</i></h2><p>खुले लाइसेंस वाली ये तस्वीरें केवल दृश्य संदर्भ देती हैं। समिति की अपनी गतिविधियों की तस्वीरें अधिकृत फोटो एल्बम में अलग से प्रकाशित होंगी।</p></div><RepresentativePhotoStrip images={['temple','volunteers','ramappa','kumbh']}/></section></>}
+      {slug === 'projects' && (items.length ? <Cards items={items} kind="projects"/> : <DeclaredWorkAreas/>)}
+      {slug === 'news' && <><div className="updates-columns"><section><div className="eyebrow dark">प्रकाशित समाचार</div>{items.length ? <Cards items={items} kind="news"/> : <Empty>अभी कोई समाचार प्रकाशित नहीं है। नई आधिकारिक जानकारी उपलब्ध होने पर यहीं दिखाई देगी।</Empty>}</section><section><div className="eyebrow dark">आगामी कार्यक्रम</div>{upcomingEvents.length ? <Cards items={upcomingEvents} kind="events"/> : <Empty>अभी किसी आगामी कार्यक्रम की सूचना प्रकाशित नहीं है। कार्यक्रम घोषित होने पर तारीख, स्थान और विवरण यहीं दिखेंगे।</Empty>}</section></div><section className="updates-context"><div className="page-lead"><h2>समिति के <i>घोषित उद्देश्य</i></h2><p>समाचार और कार्यक्रमों के साथ समिति के घोषित कार्यक्षेत्र का परिचय। तस्वीरें केवल प्रतिनिधि उदाहरण हैं, समिति की गतिविधियों का दावा नहीं।</p></div><div className="objective-grid">{objectives.slice(0,3).map((text,i)=><article className="objective-card" key={text}><span>{String(i+1).padStart(2,'0')}</span><p>{text}</p></article>)}</div><RepresentativePhotoStrip images={['kumbh','volunteers','temple']}/></section></>}
+      {['notices','events','activities','welfare','leadership','reports','awards'].includes(slug) && <Cards items={items} kind={page.kind || slug}/>}
       {page.kind === 'join' && <PublicForm kind="join"/>}
       {slug === 'contact' && <PublicForm kind="contact"/>}
       {slug === 'donate' && <div className="support-notice"><b>भुगतान सुविधा सक्रिय नहीं है</b><p>बैंक विवरण या भुगतान निर्देश इस project में verified public configuration के रूप में उपलब्ध नहीं हैं। किसी भुगतान को इस वेबसाइट से न भेजें। सामान्य पूछताछ के लिए संपर्क फ़ॉर्म का उपयोग करें।</p><Link className="button gold" href="/contact">संपर्क करें <span>↗</span></Link></div>}

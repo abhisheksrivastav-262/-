@@ -20,3 +20,66 @@
 .about-highlights p{font-size:12px;color:var(--muted);line-height:1.9;margin:0}
 @media(max-width:760px){.about-highlights{grid-template-columns:1fr}}
 .work-area-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.work-area-card{border:1px solid var(--line);background:#fff;min-width:0}.work-area-card>img{display:block;width:100%;aspect-ratio:16/10;object-fit:cover}.work-area-card>div{padding:18px}.work-area-card small{font:10px var(--sans);letter-spacing:.4px;color:var(--saffron)}.work-area-card h3{color:var(--navy);font-size:17px;font-weight:500;margin:9px 0}.work-area-card p{font-size:12px;line-height:1.9;color:var(--muted);min-height:68px}.work-area-card span{font:9px var(--sans);line-height:1.7;color:#77838c}.work-area-card a{text-decoration:underline;text-underline-offset:2px}.work-area-cta{margin-top:24px;padding:16px 20px;background:#f7f5f0;display:flex;align-items:center;justify-content:space-between;gap:18px}.work-area-cta p{margin:0;font-size:12px;color:var(--muted)}.updates-columns{display:grid;grid-template-columns:1fr 1fr;gap:26px}.updates-columns>section{min-width:0}.updates-columns .feature-grid{grid-template-columns:1fr;margin-top:15px}.updates-columns .empty-feature{height:100%;margin-top:13px}.updates-context{margin-top:64px;padding-top:40px;border-top:1px solid var(--line)}.updates-context>.representative-strip{margin-top:28px}.page-photo-section{margin-top:42px}.gallery-status>.empty-feature{margin-bottom:30px}@media(max-width:760px){.work-area-grid{grid-template-columns:1fr 1fr}.updates-columns{grid-template-columns:1fr}.updates-columns>section+section{margin-top:12px}.work-area-card p{min-height:0}}@media(max-width:480px){.work-area-grid{grid-template-columns:1fr}.work-area-cta{align-items:flex-start;flex-direction:column}}
+.membership-hero-cta{margin-top:10px;display:inline-flex}
+.membership-application{max-width:900px;margin:0 auto}
+.membership-form{display:grid;grid-template-columns:1fr;gap:20px;max-width:none}
+.form-introduction{padding:4px 0 8px}
+.form-introduction h2{font-size:clamp(23px,3vw,34px);line-height:1.5;color:var(--navy);margin:8px 0}
+.form-introduction h2 i{color:var(--saffron);font-style:normal}
+.form-introduction p{max-width:680px;color:var(--muted);font-size:13px;line-height:1.9}
+.application-section{min-width:0;margin:0;padding:22px;border:1px solid var(--line);background:#fff}
+.application-section legend{padding:0 10px;color:var(--navy);font-weight:600;font-size:15px}
+.application-section legend>span{display:inline-grid;place-items:center;width:28px;height:28px;margin-right:8px;background:#f5eddf;color:var(--saffron);font:600 11px var(--sans);border-radius:50%}
+.application-section legend>b{margin-left:7px;color:#a74535;font-size:10px}
+.membership-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.membership-grid label{display:grid;align-content:start;gap:7px;color:#53616e;font-size:12px}
+.form .membership-grid input,.form .membership-grid select,.form .membership-grid textarea{width:100%;min-width:0;border:1px solid #d9dfe3;background:#fff;padding:12px;font:13px var(--serif);color:var(--ink)}
+.form .membership-grid input:focus,.form .membership-grid select:focus,.form .membership-grid textarea:focus{border-color:#bd8c4e;outline:2px solid #e5cda4}
+.membership-grid .fieldwide{grid-column:1/-1}
+.membership-grid label small{color:var(--muted);font-size:10px;line-height:1.7}
+.photo-upload-row{display:grid;grid-template-columns:160px minmax(0,1fr);gap:22px;align-items:center}
+.photo-preview{width:160px;height:190px;border:1px dashed #cfc7b9;background:#faf8f3;display:grid;place-items:center;overflow:hidden}
+.photo-preview>img{width:100%;height:100%;object-fit:cover}
+.photo-preview>div{display:grid;justify-items:center;gap:10px;color:var(--muted);text-align:center}
+.photo-preview>div span{font-size:30px;color:#b8a98e}
+.photo-preview small,.photo-filename{font-size:10px;color:var(--muted)}
+.photo-upload-copy p{font-size:12px;color:var(--muted);line-height:1.8}
+.form .photo-file-input{display:block;width:min(100%,420px);padding:9px;border:1px dashed #cfc7b9;background:#fff;font-size:11px}
+.photo-file-input::file-selector-button{margin-right:10px;padding:8px 10px;border:0;background:#f1e8d8;color:var(--navy);font:12px var(--serif);cursor:pointer}
+.photo-actions{display:flex;align-items:center;gap:12px;margin-top:12px}
+.photo-actions .button{min-width:0;padding:9px 13px;font-size:11px}
+.photo-actions .textbutton{padding:8px;color:#9a3d32}
+.photo-filename{display:block;margin-top:8px}
+.declaration-check{display:flex!important;align-items:flex-start;gap:11px;padding:16px;background:#f8f6f1;border:1px solid var(--line);font-size:11px!important;line-height:1.8}
+.form .declaration-check input{flex:0 0 auto;width:17px;height:17px;margin-top:3px;accent-color:var(--navy)}
+.privacy-note{margin:0;color:var(--muted)}
+.submit-application{justify-self:start;min-width:220px}
+.application-success{padding:clamp(24px,5vw,54px);background:#fff;border:1px solid var(--line);text-align:center;box-shadow:0 20px 55px #172e4010}
+.success-mark{display:grid;place-items:center;width:54px;height:54px;margin:0 auto 18px;background:#edf4ee;color:#3c7047;border-radius:50%;font-size:27px}
+.application-success h2{color:var(--navy);font-size:clamp(22px,3vw,31px);line-height:1.6}
+.application-success h2 i{color:var(--saffron);font-style:normal}
+.application-success>p:not(.eyebrow){max-width:600px;margin:0 auto 18px;color:var(--muted);font-size:13px;line-height:1.9}
+.application-reference{display:grid;gap:7px;width:max-content;max-width:100%;margin:24px auto;padding:14px 22px;background:#f8f5ee;border:1px solid var(--line)}
+.application-reference small{color:var(--muted);font-size:10px}
+.application-reference strong{font:700 16px var(--sans);color:var(--navy);letter-spacing:1px}
+.application-review-card{grid-template-columns:minmax(0,1fr) minmax(230px,.45fr);align-items:start}
+.application-record-heading{display:grid;grid-template-columns:minmax(0,1fr) 130px;gap:16px;align-items:start}
+.application-record-heading h3{margin:8px 0;color:var(--navy);font-size:18px}
+.application-ref-label{display:block;margin:0;font:10px var(--sans);color:var(--muted);letter-spacing:.3px}
+.application-photo-link{display:grid;gap:5px;justify-items:center;text-decoration:none}
+.application-photo{width:112px;height:140px;object-fit:cover;border:1px solid var(--line);background:#f7f5f0}
+.application-photo-link small,.application-photo-placeholder small{font-size:9px;color:var(--muted);text-align:center}
+.application-photo-placeholder{width:112px;height:140px;display:grid;align-content:center;justify-items:center;gap:8px;background:#f7f5f0;border:1px dashed var(--line);color:#a89b86}
+.application-photo-placeholder>span{font-size:25px}
+.application-detail-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px 16px;margin-top:16px}
+.application-detail-grid p{display:grid;gap:4px;margin:0;min-width:0;overflow-wrap:anywhere;font-size:11px;line-height:1.7}
+.application-detail-grid p>b{color:var(--muted);font-size:10px;font-weight:500}
+.application-detail-grid p>span{color:var(--ink)}
+.application-detail-grid .detail-wide{grid-column:1/-1}
+.application-message{white-space:pre-wrap}
+.keep-pending-button{grid-column:1/-1;justify-self:start}
+.application-review-card .applicationactions{position:sticky;top:110px}
+.applicationactions .keep-pending-button{padding:9px;border:1px solid var(--line)}
+@media(max-width:760px){.application-section{padding:16px}.membership-grid{grid-template-columns:1fr}.membership-grid .fieldwide{grid-column:auto}.photo-upload-row{grid-template-columns:120px minmax(0,1fr);gap:14px}.photo-preview{width:120px;height:150px}.application-review-card{grid-template-columns:1fr}.application-review-card .applicationactions{position:static}.application-record-heading{grid-template-columns:minmax(0,1fr) 96px}.application-photo,.application-photo-placeholder{width:88px;height:112px}.application-detail-grid{grid-template-columns:1fr 1fr}.application-detail-grid .detail-wide{grid-column:1/-1}}
+@media(max-width:480px){.photo-upload-row{grid-template-columns:1fr}.photo-preview{width:132px;height:164px}.application-detail-grid{grid-template-columns:1fr}.application-detail-grid .detail-wide{grid-column:auto}.submit-application{width:100%}}
+.form .status[role=alert]{background:#fff0ed;color:#8c2f25;border:1px solid #f0c8c0}.photo-view-button{appearance:none;-webkit-appearance:none;font:inherit;cursor:pointer}.photo-view-button:disabled{cursor:wait;opacity:.7}

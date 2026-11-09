@@ -10,16 +10,33 @@ export async function GET() {
 
   const { data, error: queryError } = await db
     .from('membership_applications')
-    .select('id,full_name,mobile,email,state,message,status,approval_stage,assigned_unit_id,created_at')
+    .select('id,full_name,parent_name,date_of_birth,gender,occupation,education,mobile,email,state,district,tehsil,block,address_line1,address_line2,pincode,referrer_name,referrer_member_no,declaration_accepted,message,status,approval_stage,assigned_unit_id,photo_path,created_at')
     .eq('status', 'pending')
     .order('created_at', { ascending: false })
     .limit(1000);
   if (queryError) return NextResponse.json({ error: 'आवेदन लोड नहीं हुए। migration लागू है?' }, { status: 503 });
 
-  const applications = [];
+  const visibleApplications = [];
   for (const app of data || []) {
-    if (await canReviewStage(db, actor, app)) applications.push(app);
+    if (await canReviewStage(db, actor, app)) visibleApplications.push(app);
   }
+
+  const unitIds = [...new Set(visibleApplications.map((app) => app.assigned_unit_id).filter((id): id is string => Boolean(id)))];
+  const unitQuery = unitIds.length
+    ? await db.from('organizational_units').select('id,name,state,district').in('id', unitIds)
+    : { data: [], error: null };
+  if (unitQuery.error) return NextResponse.json({ error: 'आवेदन की संगठन इकाई लोड नहीं हुई।' }, { status: 503 });
+  const units = new Map((unitQuery.data || []).map((unit) => [unit.id, unit]));
+
+  const applications = visibleApplications.map((app) => {
+    const application = Object.fromEntries(Object.entries(app).filter(([key]) => key !== 'photo_path'));
+    return {
+      ...application,
+      application_reference: `ABVDS-APP-${app.id.replaceAll('-', '').slice(0, 12).toUpperCase()}`,
+      assigned_unit: app.assigned_unit_id ? units.get(app.assigned_unit_id) || null : null,
+      has_photo: Boolean(app.photo_path),
+    };
+  });
   return NextResponse.json({ applications, actor_role: actor.role }, { headers: { 'Cache-Control': 'no-store' } });
 }
 
@@ -38,7 +55,7 @@ export async function POST(request: Request) {
   // Actor identity and role always come from the verified server session.
   const id = typeof body.application_id === 'string' ? body.application_id : '';
   const action = typeof body.action === 'string' ? body.action : '';
-  if (!UUID_PATTERN.test(id) || !['advance', 'approve', 'reject'].includes(action)) {
+  if (!UUID_PATTERN.test(id) || !['advance', 'approve', 'reject', 'keep_pending'].includes(action)) {
     return NextResponse.json({ error: 'अमान्य आवेदन कार्य।' }, { status: 400 });
   }
 
@@ -54,6 +71,20 @@ export async function POST(request: Request) {
   }
   if (!PENDING_STAGES.includes(app.approval_stage as (typeof PENDING_STAGES)[number])) {
     return NextResponse.json({ error: 'आवेदन का समीक्षा चरण मान्य नहीं है।' }, { status: 409 });
+  }
+
+  if (action === 'keep_pending') {
+    const { error: logError } = await db.from('activity_logs').insert({
+      actor_id: actor.user.id,
+      target_application_id: id,
+      org_unit_id: app.assigned_unit_id,
+      action: 'membership.review.kept_pending',
+      entity_type: 'membership_applications',
+      entity_id: id,
+      details: { approval_stage: app.approval_stage },
+    });
+    if (logError) return NextResponse.json({ error: 'आवेदन लंबित है, लेकिन audit entry नहीं लिखी जा सकी।' }, { status: 500 });
+    return NextResponse.json({ ok: true, status: 'pending', approval_stage: app.approval_stage });
   }
 
   if (action === 'advance') {
@@ -100,6 +131,9 @@ export async function POST(request: Request) {
   }
   if (actor.role === 'admin' && app.approval_stage !== 'pending_admin') {
     return NextResponse.json({ error: 'अंतिम निर्णय केवल Admin समीक्षा चरण में किया जा सकता है।' }, { status: 403 });
+  }
+  if (action === 'approve' && app.approval_stage !== 'pending_admin') {
+    return NextResponse.json({ error: 'अंतिम स्वीकृति केवल Admin समीक्षा चरण में की जा सकती है।' }, { status: 409 });
   }
 
   if (action === 'reject') {

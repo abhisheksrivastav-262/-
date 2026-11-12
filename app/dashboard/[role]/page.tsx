@@ -6,6 +6,7 @@ import { ContentManager } from './content-manager';
 import { OrganizationManager } from './organization-manager';
 import { ApplicationManager } from './application-manager';
 import { DashboardNav } from './dashboard-nav';
+import { AdminIDCardManager, MemberIDCardDashboard } from '../../id-card-view';
 
 export default async function Dashboard({ params }: { params: Promise<{ role: string }> }) {
   const { role: requested } = await params;
@@ -21,9 +22,10 @@ export default async function Dashboard({ params }: { params: Promise<{ role: st
       <header id="dashboard" className="dashboard-top"><div><span className="eyebrow dark">सुरक्षित कार्यक्षेत्र</span><h1>{roleLabels[role]} डैशबोर्ड</h1><p>भूमिका और सत्र सत्यापन पूरा हुआ। उपलब्ध विकल्प आपकी assigned role के अनुसार हैं।</p></div><Link className="button outline darkoutline" href="/">वेबसाइट देखें ↗</Link></header>
       {role !== 'member' && <div id="users" className="dashboard-module"><UserManagement/></div>}
       {role !== 'member' && <div id="applications" className="dashboard-module"><ApplicationManager/></div>}
+      {['super_admin','admin'].includes(role) && <div id="id-cards" className="dashboard-module"><AdminIDCardManager/></div>}
       {['super_admin','admin'].includes(role) && <div id="organization" className="dashboard-module"><OrganizationManager/></div>}
       {role === 'super_admin' && <div id="website" className="dashboard-module"><ContentManager/></div>}
-      {role === 'member' && <div className="member-placeholder"><span>◎</span><div><h2>सदस्य क्षेत्र</h2><p>सदस्य प्रोफ़ाइल, डिजिटल पहचान पत्र, भुगतान और शिकायत सेवाएँ अभी उपलब्ध नहीं हैं।</p></div></div>}
+      {role === 'member' && <div id="id-cards" className="dashboard-module"><MemberIDCardDashboard/></div>}
       <footer className="dashboard-footnote">समिति प्रबंधन पोर्टल · सुरक्षित सत्र</footer>
     </div>
   </div></section>;

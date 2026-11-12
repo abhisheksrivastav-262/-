@@ -11,6 +11,7 @@ export function DashboardNav({ role, email }: { role: DashboardRole; email: stri
     { id: 'home', label: 'Home', href: '/' },
     { id: 'dashboard', label: 'Dashboard', href: '#dashboard' },
     ...(role !== 'member' ? [{ id: 'users', label: 'उपयोगकर्ता', href: '#users' }, { id: 'applications', label: 'सदस्यता आवेदन', href: '#applications' }] : []),
+    ...(['super_admin','admin','member'].includes(role) ? [{ id: 'id-cards', label: 'Digital ID Cards', href: '#id-cards' }] : []),
     ...(['super_admin','admin'].includes(role) ? [{ id: 'organization', label: 'संगठन संरचना', href: '#organization' }] : []),
     ...(role === 'super_admin' ? [{ id: 'website', label: 'वेबसाइट सामग्री', href: '#website' }] : []),
   ];
@@ -20,7 +21,7 @@ export function DashboardNav({ role, email }: { role: DashboardRole; email: stri
   }, []);
   return <aside className="dashboard-sidebar" aria-label="डैशबोर्ड नेविगेशन">
     <div className="sidebar-brand"><span className="seal" aria-hidden="true">ॐ</span><div><b>समिति</b><small>सुरक्षित कार्यक्षेत्र</small></div></div>
-    <nav className="sidebar-links">{items.map(item => <Link key={item.id} href={item.href} className={`${active === item.id ? 'active' : ''} ${item.id === 'home' ? 'sidebar-home' : ''}`} onClick={()=>{if(item.id==='home')setActive('home');else setActive(item.id)}}><span aria-hidden="true">{item.id==='home'?'⌂':item.id==='dashboard'?'▦':item.id==='users'?'♙':item.id==='applications'?'▤':item.id==='organization'?'⌘':'✎'}</span>{item.label}</Link>)}</nav>
+    <nav className="sidebar-links">{items.map(item => <Link key={item.id} href={item.href} className={`${active === item.id ? 'active' : ''} ${item.id === 'home' ? 'sidebar-home' : ''}`} onClick={()=>{if(item.id==='home')setActive('home');else setActive(item.id)}}><span aria-hidden="true">{item.id==='home'?'⌂':item.id==='dashboard'?'▦':item.id==='users'?'♙':item.id==='applications'?'▤':item.id==='id-cards'?'▣':item.id==='organization'?'⌘':'✎'}</span>{item.label}</Link>)}</nav>
     <div className="sidebar-account"><span className="avatar-mark">{(email[0] || 'स').toUpperCase()}</span><div><b>{labels[role]}</b><small title={email}>{email}</small></div></div>
     <form action="/api/auth/logout" method="post" className="sidebar-logout"><button type="submit">↪ <span>लॉगआउट</span></button></form>
   </aside>;
